@@ -1,0 +1,7 @@
+<included>
+    <include resource="logback/defaults.xml" />
+    <include resource="logback/console-appender.xml" />
+    <root level="info">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</included>
