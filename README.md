@@ -26,6 +26,6 @@
 # 自定义的工具
 主要分为三大类，分别是常量类、基础类和工具类。
 
-使用javadoc -d命令生成javadoc，可以看到所有类的描述。
+在线api：https://jujube-framework.github.io/jujube-core/docs/api/index.html
 
 
