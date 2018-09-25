@@ -30,7 +30,6 @@ import java.util.*;
  * Estimates the size (memory representation) of Java objects.
  *
  * @author John Li
- * @lucene.internal
  * @see #sizeOf(Object)
  * @see #shallowSizeOf(Object)
  * @see #shallowSizeOfInstance(Class)

@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
  * @author John Li Email：jujubeframework@163.com
  */
 public class ExcelReader implements Iterable<List<String>> {
-    // 一个Sheet工作薄
+    /** 一个Sheet工作薄 */
     private Sheet sheet;
-    // 工作薄的总行数
+    /** 工作薄的总行数 */
     private int rowCount;
     private ExcelReaderConfig config;
     private File currentExcel;
@@ -42,7 +42,7 @@ public class ExcelReader implements Iterable<List<String>> {
      * 
      * @param file
      *            Excel文件
-     * @param sheetName
+     * @param sheetIndex
      *            要解析的sheetIndex,从0开始
      */
     public ExcelReader(File file, int sheetIndex, ExcelReaderConfig config) {
@@ -187,7 +187,7 @@ public class ExcelReader implements Iterable<List<String>> {
     }
 
     private class Itr implements Iterator<List<String>> {
-        // 工作薄的当前行数
+        /** 工作薄的当前行数 */
         private int currentNum;
 
         @Override

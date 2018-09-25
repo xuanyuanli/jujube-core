@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 简单Java对象 转换工具类，主要用于把源对象Bean转换为Pojo <br>
- * <li>针对字段名，驼峰命名和下划线命名可以完成自动转换并赋值。例如A对象到B对象，A中有user_type字段，B中有userType，可以完成user_type->userType的字段赋值，如果类型不一致，也会自动转换</li>
+ * <p>针对字段名，驼峰命名和下划线命名可以完成自动转换并赋值。例如A对象到B对象，A中有user_type字段，B中有userType，可以完成user_type-&gt;userType的字段赋值，如果类型不一致，也会自动转换</p>
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

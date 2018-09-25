@@ -140,7 +140,7 @@ public class Ftps {
      * 在服务器上创建一个文件夹
      * 
      * @param dir
-     *            文件夹名称，不能含有特殊字符，如 \ 、/ 、: 、* 、?、 "、 <、>...
+     *            文件夹名称，不能含有特殊字符，如 \ 、/ 、: 、* 、?、 "、 &lt;、&gt;...
      */
     public boolean makeDirectory(String dir) {
         try {

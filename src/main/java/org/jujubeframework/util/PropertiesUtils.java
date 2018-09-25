@@ -20,8 +20,7 @@ public class PropertiesUtils {
     /**
      * 保存内容到相应路径
      * 
-     * @see {@link saveProperties(String descPath, List<String> content, String
-     *      encoding, boolean escapeUnicode)}
+     * @see PropertiesUtils#saveProperties(String, List, String, boolean)
      */
     public static void saveProperties(String descPath, String content, String encoding, boolean escapeUnicode) throws IOException {
         String[] lines = content.split("\n");

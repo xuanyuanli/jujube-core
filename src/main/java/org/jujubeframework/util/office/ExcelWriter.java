@@ -46,7 +46,7 @@ public class ExcelWriter {
     /**
      * 根据模板写入Excel
      *
-     * @param sourceFilePath
+     * @param templateFilePath
      *            模板文件路径
      * @param destFileName
      *            要写入的文件名称。注意：不是路径，只要名称即可；因为这个文件也要写入到临时目录中去
@@ -201,8 +201,6 @@ public class ExcelWriter {
     /**
      * 生成csv输入流
      *
-     * @param dest
-     *            目标路径
      * @param data
      *            数据
      */

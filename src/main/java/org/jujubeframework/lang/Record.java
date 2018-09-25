@@ -51,7 +51,7 @@ public class Record extends HashMap<String, Object> {
     }
 
     /**
-     * Get column of mysql type: int, integer, tinyint(n) n > 1, smallint,
+     * Get column of mysql type: int, integer, tinyint(n) n &gt; 1, smallint,
      * mediumint
      */
     public Integer getInt(String column) {

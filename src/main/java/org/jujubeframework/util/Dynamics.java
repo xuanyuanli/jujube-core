@@ -57,7 +57,7 @@ public class Dynamics {
     }
 
     /**
-     * @see Texts#format(pattern, params)
+     * @see Texts#format(String, String...)
      */
     public static String format(String pattern, String... params) {
         return Texts.format(pattern, params);

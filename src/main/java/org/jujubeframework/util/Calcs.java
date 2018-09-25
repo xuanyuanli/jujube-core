@@ -130,7 +130,6 @@ public class Calcs {
     /**
      * ：减法
      * 
-     * @开发人员：moshco zhu @开发时间：2011-12-13 上午09:20:55
      * @param str1
      *            被减数
      * @param str2
@@ -156,7 +155,6 @@ public class Calcs {
     /**
      * ：减法运算
      * 
-     * @开发人员：moshco zhu @开发日期：2011-04-13 下午06:15:16
      * @param str1
      *            被减数
      * @param str2
@@ -177,7 +175,6 @@ public class Calcs {
     /**
      * ：乘法运算 指定保留到小数点后位数
      * 
-     * @开发人员：moshco zhu @开发日期：2011-04-13 上午09:46:09
      * @param str1
      *            被乘数
      * @param str2

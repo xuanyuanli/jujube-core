@@ -35,8 +35,8 @@ import lombok.NoArgsConstructor;
 public class Collections3 {
 
     /**
-     * 提取集合中的对象的一个属性(通过Getter函数), 组合成List<String>.
-     * <p>
+     * 提取集合中的对象的一个属性(通过Getter函数), 组合成List&lt;String&gt;.
+     * <br>
      * 不同于Collections3，这里返回String集合
      * 
      * @param collection

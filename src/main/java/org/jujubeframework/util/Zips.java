@@ -32,8 +32,8 @@ import lombok.NoArgsConstructor;
  * zt-zip的逻辑在解压缩的时候，没有顾及编码问题，会出现中文乱码，下面有几个编码的注意点：
  * <ul>
  * <li>解压缩的时候，出现这种情况：上传的压缩文件是在Windows环境下压缩而成的（编码GBK），而在Linux服务器端系统编码为UTF-8。
- * 这时候正确解压编码为GBK。解压之前，调用{@link #setEncoding(Charset)}来设置解压缩编码</li>
- * <li>如果是要压缩文件，则根据操作系统编码调用{@link #setEncoding(Charset)}来设置压缩编码</li>
+ * 这时候正确解压编码为GBK。解压之前，调用构造来设置解压缩编码</li>
+ * <li>如果是要压缩文件，则根据操作系统编码调用构造来设置压缩编码</li>
  * <li>也就是说，压缩的时候依据当前操作系统编码；而解压缩的时候要依据压缩文件来源的操作系统（即：这个文件是什么系统编码来进行压缩的，
  * 那么解压缩的时候就要使用对应的编码）</li>
  * </ul>
@@ -1102,8 +1102,6 @@ public class Zips {
      *            an existing ZIP file (only read).
      * @param entry
      *            new ZIP entry appended.
-     * @param bytes
-     *            new entry bytes (or <code>null</code> if directory).
      */
     public void addEntry(final File zip, final ZipEntrySource entry) {
         operateInPlace(zip, new BaseInPlaceAction() {
@@ -1927,7 +1925,7 @@ public class Zips {
          *            contents of the ZIP entry.
          * @param zipEntry
          *            ZIP entry.
-         * @exception  io错误
+         * @throws  IOException io错误
          */
         void process(InputStream in, ZipEntry zipEntry) throws IOException;
 
@@ -1998,7 +1996,7 @@ public class Zips {
          * getInputStream
          * @return an input stream of the given entry or <code>null</code> if
          *         this entry is a directory.
-         * @exception   io错误
+         * @throws  IOException  io错误
          */
         InputStream getInputStream() throws IOException;
 
@@ -2122,7 +2120,7 @@ public class Zips {
          * 
          * @param zipEntry
          *            ZIP entry.
-         * @exception  io错误
+         * @throws  IOException io错误
          */
         void process(ZipEntry zipEntry) throws IOException;
 

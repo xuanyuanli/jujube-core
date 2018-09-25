@@ -91,14 +91,14 @@ public class Jsons {
 
     /**
      * 将json字符串转换为复杂类型（如泛型）的Java对象（万能，常用）
-     * 
+     *
      * <pre>
      * 用法：
-     *  1、将json字符串转换为User对象：parseJson(text,new TypeReference<User>(){})
-     *  2、将json字符串转换为List<String>的泛型：parseJson(text,new TypeReference<List<String>>(){})
-     *  3、将json字符串转换为List<Map<String,Object>>的泛型：parseJson(text,new TypeReference<List<Map<String,Object>>>(){})
+     *  1、将json字符串转换为User对象：parseJson(text,new TypeReference&lt;User&gt;(){})
+     *  2、将json字符串转换为List&lt;String&gt;的泛型：parseJson(text,new TypeReference&lt;List&lt;String&gt;&gt;(){})
+     *  3、将json字符串转换为List&lt;Map&lt;String,Object&gt;&gt;的泛型：parseJson(text,new TypeReference&lt;List&lt;Map&lt;String,Object&gt;&gt;&gt;(){})
      * </pre>
-     * 
+     *
      * @param text
      *            json字符串
      * @param typeReference
