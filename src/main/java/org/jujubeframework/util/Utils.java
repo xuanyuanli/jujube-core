@@ -266,7 +266,7 @@ public class Utils {
     }
 
     /**
-     * 获得当前项目路径（只限于Eclipse中管用）
+     * 获得当前项目路径（只限于Eclipse或IDEA中管用）
      */
     public static String getProjectPath() {
         File dir = Utils.getCurrentClasspath();
