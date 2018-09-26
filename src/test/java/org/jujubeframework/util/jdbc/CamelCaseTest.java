@@ -1,10 +1,8 @@
 package org.jujubeframework.util.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.Test;
-
 import org.jujubeframework.util.CamelCase;
+import org.junit.Test;
 
 public class CamelCaseTest {
 

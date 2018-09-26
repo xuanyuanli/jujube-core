@@ -1,13 +1,13 @@
 package org.jujubeframework.util;
 
-import org.jujubeframework.lang.Record;
-import org.jujubeframework.util.Pojos.FieldMapping;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.math.NumberUtils;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.jujubeframework.lang.Record;
+import org.jujubeframework.util.Pojos.FieldMapping;
 import org.junit.Test;
 
 import java.util.HashMap;

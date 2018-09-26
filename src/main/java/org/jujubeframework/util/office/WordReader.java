@@ -1,16 +1,15 @@
 package org.jujubeframework.util.office;
 
-import java.io.File;
-import java.io.FileInputStream;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.io.File;
+import java.io.FileInputStream;
 
 /**
  * @author John Li

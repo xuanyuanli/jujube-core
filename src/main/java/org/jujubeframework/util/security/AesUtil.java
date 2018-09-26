@@ -1,18 +1,18 @@
 package org.jujubeframework.util.security;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * AES算法（加密、解密工具类）
+ *
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,7 +23,9 @@ public class AesUtil {
 
     private static final String IVKEY = "AESAPPCLIENT_KEY";
 
-    /** 对数据加密 */
+    /**
+     * 对数据加密
+     */
     public static String encrypt(String data, String key) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
@@ -39,7 +41,9 @@ public class AesUtil {
         }
     }
 
-    /** 对数据解密 */
+    /**
+     * 对数据解密
+     */
     public static String decrypt(String data, String key) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");

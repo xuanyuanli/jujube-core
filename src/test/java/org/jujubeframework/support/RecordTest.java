@@ -1,14 +1,12 @@
 package org.jujubeframework.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.jujubeframework.lang.Record;
+import org.jujubeframework.util.Dates;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
-import org.junit.Test;
-
-import org.jujubeframework.lang.Record;
-import org.jujubeframework.util.Dates;
 
 public class RecordTest {
 

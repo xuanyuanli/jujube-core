@@ -1,12 +1,12 @@
 package org.jujubeframework.util;
 
 import com.google.common.collect.Lists;
-import org.jujubeframework.lang.Record;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.jujubeframework.lang.Record;
 import org.junit.Test;
 
 import java.util.List;
@@ -84,7 +84,7 @@ public class Collections3Test {
 
     @Test
     public void testToDiffArray() {
-        String[] arr = { "1", "1", "2" };
+        String[] arr = {"1", "1", "2"};
         assertThat(Collections3.toDiffArray(arr)).hasSize(2);
     }
 

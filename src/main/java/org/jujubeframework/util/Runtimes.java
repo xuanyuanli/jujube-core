@@ -1,12 +1,7 @@
 package org.jujubeframework.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -14,8 +9,12 @@ import org.jujubeframework.constant.SystemProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.io.File;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * 运行时工具类
@@ -45,7 +44,9 @@ public class Runtimes {
         return ZK_PATH;
     }
 
-    /** 执行命令并获得输出 */
+    /**
+     * 执行命令并获得输出
+     */
     public static Process execCommand(String command) {
         Runtime runtime = Runtime.getRuntime();
         try {
@@ -57,12 +58,16 @@ public class Runtimes {
         }
     }
 
-    /** 执行命令并获得输出,编码默认为gbk */
+    /**
+     * 执行命令并获得输出,编码默认为gbk
+     */
     public static String execCommandAndGetInput(String command) {
         return execCommandAndGetInput(command, "gbk");
     }
 
-    /** 执行命令并获得输出 */
+    /**
+     * 执行命令并获得输出
+     */
     public static String execCommandAndGetInput(String command, String charset) {
         String result = "";
         Runtime runtime = Runtime.getRuntime();
@@ -75,7 +80,9 @@ public class Runtimes {
         return result;
     }
 
-    /** 运行bat文件(仅限windows环境下使用) */
+    /**
+     * 运行bat文件(仅限windows环境下使用)
+     */
     public static void runBat(String batPath, String batName) {
         Validate.isTrue(SystemProperties.WINDOWS);
         Process ps = null;
@@ -98,14 +105,16 @@ public class Runtimes {
         }
     }
 
-    /** 运行zk启动脚步(仅限windows环境下使用) */
+    /**
+     * 运行zk启动脚步(仅限windows环境下使用)
+     */
     public static void runZookeeperStartBat() {
         runBat(getZkPath(), ZK_BAT_NAME);
     }
 
     /**
      * 获得java进程id
-     * 
+     *
      * @return java进程id
      */
     public static final int getPid() {
@@ -120,7 +129,9 @@ public class Runtimes {
         return Texts.toInt(pid);
     }
 
-    /** 获得运行时的程序名称 */
+    /**
+     * 获得运行时的程序名称
+     */
     public static String getRuntimeJarName() {
         String input = execCommandAndGetInput("jps -l", "utf-8");
         if (StringUtils.isNotBlank(input)) {
@@ -135,7 +146,9 @@ public class Runtimes {
         return null;
     }
 
-    /** 线程睡眠 */
+    /**
+     * 线程睡眠
+     */
     public static void sleep(int millis) {
         try {
             Thread.sleep(millis);
@@ -145,12 +158,15 @@ public class Runtimes {
         }
     }
 
-    /** 获得主机名 */
+    /**
+     * 获得主机名
+     */
     public static String getHostName() {
         try {
             return (InetAddress.getLocalHost()).getHostName();
         } catch (UnknownHostException uhe) {
-            String host = uhe.getMessage(); // host = "hostname: hostname"
+            // host = "hostname: hostname"
+            String host = uhe.getMessage();
             if (host != null) {
                 int colon = host.indexOf(':');
                 if (colon > 0) {

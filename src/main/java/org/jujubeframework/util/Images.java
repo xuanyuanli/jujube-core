@@ -25,35 +25,36 @@ import java.util.List;
 
 /**
  * 图像处理工具类
- * 
+ *
  * <pre>
  * 用到开源库： imageio-jpeg(https://github.com/haraldk/TwelveMonkeys)
  * Thumbnailator(https://github.com/coobird/thumbnailator/wiki/Examples)
- *</pre>
+ * </pre>
+ *
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Images {
 
-    /** 水印图片地址 */
+    /**
+     * 水印图片地址
+     */
     public static final String PROJECT_WATERMARK_PATH = "watermark.png";
 
     /**
      * 等比压缩图像(默认带水印)
-     * 
-     * @param sourceFile
-     *            源图像文件
-     * @param destFile
-     *            压缩后要存放的目标文件
-     * @param maxWidth
-     *            压缩后允许的最大宽度
-     * @param maxHeight
-     *            压缩后允许的最大高度
+     *
+     * @param sourceFile 源图像文件
+     * @param destFile   压缩后要存放的目标文件
+     * @param maxWidth   压缩后允许的最大宽度
+     * @param maxHeight  压缩后允许的最大高度
      * @throws IOException
      */
     public static void transform(File sourceFile, File destFile, int maxWidth, int maxHeight) throws IOException {
         boolean addWatermark = true;
-        if (sourceFile != null && sourceFile.getName().contains("_c.")) { // _c表示已经加过水印了
+        // _c表示已经加过水印了
+        String suffix = "_c.";
+        if (sourceFile != null && sourceFile.getName().contains(suffix)) {
             addWatermark = false;
         }
         transform(sourceFile, destFile, maxWidth, maxHeight, addWatermark);
@@ -61,7 +62,7 @@ public class Images {
 
     /**
      * @see transform(File sourceFile, File destFile, int maxWidth, int
-     *      maxHeight) throws IOException
+     * maxHeight) throws IOException
      */
     public static void transform(File sourceFile, File destFile, int maxWidth, int maxHeight, boolean addWatermark) throws IOException {
         rotateImage(sourceFile);
@@ -75,7 +76,9 @@ public class Images {
         }
     }
 
-    /** 本来应该根据图片旋转的角度来进行更正 */
+    /**
+     * 本来应该根据图片旋转的角度来进行更正
+     */
     private static void rotateImage(File sourceFile) throws IOException {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(sourceFile);
@@ -84,27 +87,36 @@ public class Images {
                 return;
             }
             Integer orientation = directory.getInteger(ExifIFD0Directory.TAG_ORIENTATION);
-            if (orientation != null) { // 进行图片旋转
-                if (orientation > 1) {// 把这些特殊的图片暂时放到试验地
+            // 进行图片旋转
+            if (orientation != null) {
+                // 把这些特殊的图片暂时放到试验地
+                if (orientation > 1) {
                     FileUtils.copyFile(sourceFile, new File("/tmp/" + sourceFile.getName()));
                 }
 
                 int turn = 0;
-                if (orientation == 3) {
+                int i3 = 3;
+                int i6 = 6;
+                int i8 = 8;
+                if (orientation == i3) {
                     turn = 180;
-                } else if (orientation == 6) {
+                } else if (orientation == i6) {
                     turn = 90;
-                } else if (orientation == 8) {
+                } else if (orientation == i8) {
                     turn = 270;
                 }
 
                 if (turn > 0) {
                     if (directory.containsTag(ExifIFD0Directory.TAG_MAKE)) {
                         String mark = directory.getDescription(ExifIFD0Directory.TAG_MAKE);
-                        if ("Canon".equalsIgnoreCase(mark)) { // 测试发现，对于佳能来说，只有旋转360°才回复正常
+                        // 测试发现，对于佳能来说，只有旋转360°才回复正常
+                        String canon = "Canon";
+                        if (canon.equalsIgnoreCase(mark)) {
                             turn = 360;
                         }
-                        if (Texts.find(mark, "[iI][pP]hone")) {// 对于iphone，这里不处理，交由下一步
+                        // 对于iphone，这里不处理，交由下一步
+                        String regEx = "[iI][pP]hone";
+                        if (Texts.find(mark, regEx)) {
                             return;
                         }
                     }
@@ -117,7 +129,9 @@ public class Images {
         }
     }
 
-    /** 对角线的水印 */
+    /**
+     * 对角线的水印
+     */
     static void innerTransform(BufferedImage sourceImage, File destFile, int maxWidth, int maxHeight, boolean haveWatermark) throws IOException {
         if (sourceImage.getWidth() <= maxWidth && sourceImage.getHeight() <= maxHeight) {
             maxHeight = sourceImage.getHeight();
@@ -139,7 +153,9 @@ public class Images {
         builder.toFile(destFile);
     }
 
-    /** 随机的水印 */
+    /**
+     * 随机的水印
+     */
     static void innerTransformOfRand(BufferedImage sourceImage, File destFile, int maxWidth, int maxHeight, boolean haveWatermark) throws IOException {
         if (sourceImage.getWidth() <= maxWidth && sourceImage.getHeight() <= maxHeight) {
             maxHeight = sourceImage.getHeight();
@@ -171,11 +187,14 @@ public class Images {
         builder.toFile(destFile);
     }
 
-    /** 根据原图尺寸和水印尺寸获得水印坐标 */
+    /**
+     * 根据原图尺寸和水印尺寸获得水印坐标
+     */
     private static int getPosition(int enclosingWidth, int width, List<Integer> listPosition) {
         final int x = Randoms.randomInt(width / 2, enclosingWidth - (width + width / 2));
         int width2 = width + width / 2;
-        if (listPosition.stream().anyMatch(t -> x < t + width2 && x > t - width2)) { // 如果相距过近，则重新计算
+        // 如果相距过近，则重新计算
+        if (listPosition.stream().anyMatch(t -> x < t + width2 && x > t - width2)) {
             return getPosition(enclosingWidth, width, listPosition);
         }
         return x;
@@ -216,7 +235,9 @@ public class Images {
         }
     }
 
-    /** 对图片进行旋转 */
+    /**
+     * 对图片进行旋转
+     */
     public static BufferedImage rotate(Image src, int angel) {
         int srcWidth = src.getWidth(null);
         int srcHeight = src.getHeight(null);
@@ -235,13 +256,15 @@ public class Images {
     }
 
     public static Rectangle calcRotatedSize(Rectangle src, int angel) {
-        if (angel >= 90) {
-            if (angel / 90 % 2 == 1) {
+        int num = 90;
+        if (angel >= num) {
+            boolean bool = angel / num % 2 == 1;
+            if (bool) {
                 int temp = src.height;
                 src.height = src.width;
                 src.width = temp;
             }
-            angel = angel % 90;
+            angel = angel % num;
         }
 
         double r = Math.sqrt(src.height * src.height + src.width * src.width) / 2.0;
@@ -258,28 +281,43 @@ public class Images {
     }
 
     public static int getOrientation(String orientation) {
+        orientation = Dynamics.orElse(orientation, "");
         int tag = 0;
-        if ("Top, left side (Horizontal / normal)".equalsIgnoreCase(orientation)) {
-            tag = 1;
-        } else if ("Top, right side (Mirror horizontal)".equalsIgnoreCase(orientation)) {
-            tag = 2;
-        } else if ("Bottom, right side (Rotate 180)".equalsIgnoreCase(orientation)) {
-            tag = 3;
-        } else if ("Bottom, left side (Mirror vertical)".equalsIgnoreCase(orientation)) {
-            tag = 4;
-        } else if ("Left side, top (Mirror horizontal and rotate 270 CW)".equalsIgnoreCase(orientation)) {
-            tag = 5;
-        } else if ("Right side, top (Rotate 90 CW)".equalsIgnoreCase(orientation)) {
-            tag = 6;
-        } else if ("Right side, bottom (Mirror horizontal and rotate 90 CW)".equalsIgnoreCase(orientation)) {
-            tag = 7;
-        } else if ("Left side, bottom (Rotate 270 CW)".equalsIgnoreCase(orientation)) {
-            tag = 8;
+        switch (orientation) {
+            case "Top, left side (Horizontal / normal)":
+                tag = 1;
+                break;
+            case "Top, right side (Mirror horizontal)":
+                tag = 2;
+                break;
+            case "Bottom, right side (Rotate 180)":
+                tag = 3;
+                break;
+            case "Bottom, left side (Mirror vertical)":
+                tag = 4;
+                break;
+            case "Left side, top (Mirror horizontal and rotate 270 CW)":
+                tag = 5;
+                break;
+            case "Right side, top (Rotate 90 CW)":
+                tag = 6;
+                break;
+            case "Right side, bottom (Mirror horizontal and rotate 90 CW)":
+                tag = 7;
+                break;
+            case "Left side, bottom (Rotate 270 CW)":
+                tag = 8;
+                break;
+            default:
+                tag = 0;
+                break;
         }
         return tag;
     }
 
-    /**往页面输出的方法*/
+    /**
+     * 往页面输出的方法
+     */
     public static void outputImage(BufferedImage image, ServletOutputStream out) throws IOException, NullPointerException {
         ImageWriter writer = null;
         // 下面进行对图片格式的一些修改
@@ -302,9 +340,13 @@ public class Images {
         writer.write(null, iioImage, param);
     }
 
-    /** 正对角线 */
+    /**
+     * 正对角线
+     */
     private enum PositivePositions implements Position {
-        /**TOP_LEFT*/
+        /**
+         * TOP_LEFT
+         */
         TOP_LEFT() {
             @Override
             public Point calculate(int enclosingWidth, int enclosingHeight, int width, int height, int insetLeft, int insetRight, int insetTop, int insetBottom) {
@@ -315,7 +357,9 @@ public class Images {
                 return new Point(x, y);
             }
         },
-        /**CENTER*/
+        /**
+         * CENTER
+         */
         CENTER() {
             @Override
             public Point calculate(int enclosingWidth, int enclosingHeight, int width, int height, int insetLeft, int insetRight, int insetTop, int insetBottom) {
@@ -324,7 +368,9 @@ public class Images {
                 return new Point(x, y);
             }
         },
-        /**BOTTOM_RIGHT*/
+        /**
+         * BOTTOM_RIGHT
+         */
         BOTTOM_RIGHT() {
             @Override
             public Point calculate(int enclosingWidth, int enclosingHeight, int width, int height, int insetLeft, int insetRight, int insetTop, int insetBottom) {
@@ -337,10 +383,14 @@ public class Images {
         }
     }
 
-    /** 反对角线 */
+    /**
+     * 反对角线
+     */
     @SuppressWarnings("unused")
     private enum NegativePositions implements Position {
-        /**TOP_RIGHT*/
+        /**
+         * TOP_RIGHT
+         */
         TOP_RIGHT() {
             @Override
             public Point calculate(int enclosingWidth, int enclosingHeight, int width, int height, int insetLeft, int insetRight, int insetTop, int insetBottom) {
@@ -351,7 +401,9 @@ public class Images {
                 return new Point(x, y);
             }
         },
-        /**CENTER*/
+        /**
+         * CENTER
+         */
         CENTER() {
             @Override
             public Point calculate(int enclosingWidth, int enclosingHeight, int width, int height, int insetLeft, int insetRight, int insetTop, int insetBottom) {
@@ -360,7 +412,9 @@ public class Images {
                 return new Point(x, y);
             }
         },
-        /**BOTTOM_LEFT*/
+        /**
+         * BOTTOM_LEFT
+         */
         BOTTOM_LEFT() {
             @Override
             public Point calculate(int enclosingWidth, int enclosingHeight, int width, int height, int insetLeft, int insetRight, int insetTop, int insetBottom) {

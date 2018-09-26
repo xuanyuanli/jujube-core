@@ -2,7 +2,7 @@ package org.jujubeframework.util.office;
 
 /**
  * TableDataReader的配置器
- * 
+ *
  * @author John Li Email：jujubeframework@163.com
  */
 public class ExcelReaderConfig {
@@ -11,7 +11,9 @@ public class ExcelReaderConfig {
     private boolean blankLineTerminated;
 
     public static final ExcelReaderConfig DEFAULT = new ExcelReaderConfig(true, true, false);
-    /** 所有参数默认为ture */
+    /**
+     * 所有参数默认为ture
+     */
     public static final ExcelReaderConfig ALL_RIGHT = new ExcelReaderConfig(true, true, true);
 
     public ExcelReaderConfig() {

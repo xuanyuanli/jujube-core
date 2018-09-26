@@ -1,34 +1,22 @@
 package org.jujubeframework.util.office;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
-import org.apache.poi.ss.usermodel.DataValidation;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jujubeframework.constant.SystemProperties;
+import org.jujubeframework.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jujubeframework.util.Utils;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Excel写入工具类
@@ -46,14 +34,10 @@ public class ExcelWriter {
     /**
      * 根据模板写入Excel
      *
-     * @param templateFilePath
-     *            模板文件路径
-     * @param destFileName
-     *            要写入的文件名称。注意：不是路径，只要名称即可；因为这个文件也要写入到临时目录中去
-     * @param copyLineIndex
-     *            设定保留模板前几行
-     * @param lines
-     *            数据
+     * @param templateFilePath 模板文件路径
+     * @param destFileName     要写入的文件名称。注意：不是路径，只要名称即可；因为这个文件也要写入到临时目录中去
+     * @param copyLineIndex    设定保留模板前几行
+     * @param lines            数据
      * @param sheetHandler
      * @return File 已经写入数据的Excel。如果出错，则返回null
      */
@@ -118,10 +102,8 @@ public class ExcelWriter {
     /**
      * 生成excle
      *
-     * @param destFile
-     *            excel文件地址
-     * @param lines
-     *            数据
+     * @param destFile excel文件地址
+     * @param lines    数据
      */
     public static void generateExcel(File destFile, List<List<String>> lines) {
         FileOutputStream outputStream = null;
@@ -149,9 +131,8 @@ public class ExcelWriter {
 
     /**
      * 生成excle
-     * 
-     * @param lines
-     *            数据
+     *
+     * @param lines 数据
      */
     public static InputStream generateExcelInputStream(List<List<String>> lines) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -185,10 +166,8 @@ public class ExcelWriter {
     /**
      * 生成csv文件
      *
-     * @param dest
-     *            目标路径
-     * @param data
-     *            数据
+     * @param dest 目标路径
+     * @param data 数据
      */
     public static void generateCsv(File dest, List<List<String>> data) {
         try {
@@ -201,8 +180,7 @@ public class ExcelWriter {
     /**
      * 生成csv输入流
      *
-     * @param data
-     *            数据
+     * @param data 数据
      */
     public static InputStream generateCsvInputStream(List<List<String>> data) {
         try {
@@ -233,19 +211,13 @@ public class ExcelWriter {
 
     /**
      * 设置某些列的值只能输入预制的数据,显示下拉框.
-     * 
-     * @param sheet
-     *            要设置的sheet.
-     * @param textlist
-     *            下拉框显示的内容
-     * @param firstRow
-     *            开始行
-     * @param endRow
-     *            结束行
-     * @param firstCol
-     *            开始列
-     * @param endCol
-     *            结束列
+     *
+     * @param sheet    要设置的sheet.
+     * @param textlist 下拉框显示的内容
+     * @param firstRow 开始行
+     * @param endRow   结束行
+     * @param firstCol 开始列
+     * @param endCol   结束列
      * @return 设置好的sheet.
      */
     public static Sheet setValidation(Sheet sheet, String[] textlist, int firstRow, int endRow, int firstCol, int endCol) {

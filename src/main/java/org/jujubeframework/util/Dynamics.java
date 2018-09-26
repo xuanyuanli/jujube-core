@@ -1,17 +1,11 @@
 package org.jujubeframework.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.beust.jcommander.internal.Sets;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
 
 /**
  * 模仿动态语言的一些方法
@@ -63,7 +57,9 @@ public class Dynamics {
         return Texts.format(pattern, params);
     }
 
-    /** 如果t为空，则返回other */
+    /**
+     * 如果t为空，则返回other
+     */
     public static <T> T orElse(T t, T other) {
         if (t == null) {
             return other;
@@ -72,7 +68,9 @@ public class Dynamics {
         }
     }
 
-    /** 模仿js中对象转为bool的判断 */
+    /**
+     * 模仿js中对象转为bool的判断
+     */
     @SuppressWarnings("rawtypes")
     public static boolean bool(Object obj) {
         if (obj == null) {
@@ -105,12 +103,16 @@ public class Dynamics {
         return true;
     }
 
-    /** 快捷的join方法 */
+    /**
+     * 快捷的join方法
+     */
     public static String join(Object[] array, String separator) {
         return StringUtils.join(array, separator);
     }
 
-    /** 快捷的join方法 */
+    /**
+     * 快捷的join方法
+     */
     public static String join(Iterable<?> collection, String separator) {
         return StringUtils.join(collection, separator);
     }

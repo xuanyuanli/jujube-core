@@ -1,20 +1,19 @@
 package org.jujubeframework.util.security;
 
-import java.io.IOException;
-import java.security.SecureRandom;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.io.IOException;
+import java.security.SecureRandom;
 
 /**
  * des算法（加密、解密工具类）
+ *
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,10 +22,9 @@ public class DesUtil {
 
     /**
      * Description 根据键值进行加密
-     * 
+     *
      * @param data
-     * @param key
-     *            加密键byte数组。长度必须为8,16,32,64之一
+     * @param key  加密键byte数组。长度必须为8,16,32,64之一
      */
     public static String encrypt(String data, String key) throws Exception {
         byte[] bt = encrypt(data.getBytes(), key.getBytes());
@@ -36,10 +34,9 @@ public class DesUtil {
 
     /**
      * Description 根据键值进行解密
-     * 
+     *
      * @param data
-     * @param key
-     *            加密键byte数组.长度必须为8,16,32,64之一
+     * @param key  加密键byte数组.长度必须为8,16,32,64之一
      */
     public static String decrypt(String data, String key) throws IOException, Exception {
         if (data == null) {
@@ -52,10 +49,9 @@ public class DesUtil {
 
     /**
      * 根据键值进行加密
-     * 
+     *
      * @param data
-     * @param key
-     *            加密键byte数组
+     * @param key  加密键byte数组
      */
     private static byte[] encrypt(byte[] data, byte[] key) throws Exception {
         // 生成一个可信任的随机数源
@@ -74,10 +70,9 @@ public class DesUtil {
 
     /**
      * 根据键值进行解密
-     * 
+     *
      * @param data
-     * @param key
-     *            加密键byte数组
+     * @param key  加密键byte数组
      */
     private static byte[] decrypt(byte[] data, byte[] key) throws Exception {
         // 生成一个可信任的随机数源

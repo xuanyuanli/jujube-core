@@ -1,5 +1,8 @@
 package org.jujubeframework.lang;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jujubeframework.util.Beans;
+import org.jujubeframework.util.CamelCase;
 import static org.jujubeframework.util.Dynamics.bool;
 
 import java.lang.reflect.Field;
@@ -8,13 +11,9 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.math.NumberUtils;
-
-import org.jujubeframework.util.Beans;
-import org.jujubeframework.util.CamelCase;
-
 /**
  * 一个进阶版的Map，一般作为数据库表的一行数据存在，也可以作为其他数据载体
+ *
  * @author John Li
  */
 public class Record extends HashMap<String, Object> {
@@ -153,9 +152,8 @@ public class Record extends HashMap<String, Object> {
 
     /**
      * Bean对象转换为Map,所有字段名都由驼峰转为下划线格式
-     * 
-     * @param allowNull
-     *            是否允许null值
+     *
+     * @param allowNull 是否允许null值
      */
     @SuppressWarnings("unchecked")
     private static Map<String, Object> convertBeanToMap(Object javaBean, boolean allowNull) {

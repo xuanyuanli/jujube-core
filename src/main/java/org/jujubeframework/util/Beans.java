@@ -1,5 +1,21 @@
 package org.jujubeframework.util;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import javassist.Modifier;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import net.sf.cglib.beans.BeanMap;
+import org.apache.commons.beanutils.*;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.asm.*;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.util.ClassUtils;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -16,39 +32,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.beanutils.ConvertUtilsBean;
-import org.apache.commons.beanutils.Converter;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.asm.ClassReader;
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.ClassWriter;
-import org.springframework.asm.Label;
-import org.springframework.asm.MethodVisitor;
-import org.springframework.asm.Opcodes;
-import org.springframework.asm.Type;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.util.ClassUtils;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import javassist.Modifier;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import net.sf.cglib.beans.BeanMap;
-
 /**
  * 关于类操作的，都在这里<br>
  * 用到工具栏BeanUtils，把抛出的异常屏蔽了<br>
  * 其他类操作工具类，参考：FieldUtils、MethodUtils等。如果不能满足需求，可以自己实现
- * 
+ *
  * @author John Li Email：jujubeframework@163.com
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -131,7 +119,7 @@ public class Beans {
 
     /**
      * 通过getter方法来获取值
-     * 
+     *
      * @see BeanUtils#getProperty(Object bean, String name)
      */
     public static Object getProperty(Object bean, String name) {
@@ -144,7 +132,7 @@ public class Beans {
 
     /**
      * 通过getter方法来获取值
-     * 
+     *
      * @see BeanUtils#getProperty(Object bean, String name)
      */
     public static String getPropertyAsString(Object bean, String name) {
@@ -155,7 +143,9 @@ public class Beans {
         return null;
     }
 
-    /** 获得所有的public方法 */
+    /**
+     * 获得所有的public方法
+     */
     public static Method getMethod(Class<?> cl, String methodName, Class<?>... parameterTypes) {
         Method method = null;
         try {
@@ -165,7 +155,9 @@ public class Beans {
         return method;
     }
 
-    /** 获得类的所有声明方法，包括父类中的 */
+    /**
+     * 获得类的所有声明方法，包括父类中的
+     */
     public static Method getDeclaredMethod(Class<?> cl, String methodName, Class<?>... parameterTypes) {
         try {
             Method method = getSelfDeclaredMethod(cl, methodName, parameterTypes);
@@ -178,7 +170,9 @@ public class Beans {
         return null;
     }
 
-    /** 获得类的所有声明方法，不包括父类中的 */
+    /**
+     * 获得类的所有声明方法，不包括父类中的
+     */
     public static Method getSelfDeclaredMethod(Class<?> cl, String methodName, Class<?>... parameterTypes) {
         try {
             Method method = cl.getDeclaredMethod(methodName, parameterTypes);
@@ -188,7 +182,9 @@ public class Beans {
         return null;
     }
 
-    /** 反射调用方法 */
+    /**
+     * 反射调用方法
+     */
     public static Object invoke(Method method, Object obj, Object... args) {
         try {
             return method.invoke(obj, args);
@@ -197,7 +193,9 @@ public class Beans {
         }
     }
 
-    /** 获得类的所有声明字段，包括父类中的 */
+    /**
+     * 获得类的所有声明字段，包括父类中的
+     */
     public static Field getDeclaredField(Class<?> cl, String fieldName) {
         try {
             Field field = getSelfDeclaredField(cl, fieldName);
@@ -210,7 +208,9 @@ public class Beans {
         return null;
     }
 
-    /** 获得类的所有声明字段，不包括父类中的 */
+    /**
+     * 获得类的所有声明字段，不包括父类中的
+     */
     public static Field getSelfDeclaredField(Class<?> cl, String fieldName) {
         try {
             return cl.getDeclaredField(fieldName);
@@ -227,10 +227,14 @@ public class Beans {
         }
     }
 
-    /** key为classname+fieldName */
+    /**
+     * key为classname+fieldName
+     */
     private static final ConcurrentMap<String, PropertyDescriptor> PROPERTY_DESCRIPTOR_CACHE = new ConcurrentHashMap<>();
 
-    /** 获得类的某个字段属性描述 */
+    /**
+     * 获得类的某个字段属性描述
+     */
     public static PropertyDescriptor getPropertyDescriptor(Class<?> targetClass, String fieldName) {
         String key = targetClass.getName() + ":" + fieldName;
         if (PROPERTY_DESCRIPTOR_CACHE.containsKey(key)) {
@@ -268,11 +272,9 @@ public class Beans {
 
     /**
      * 获得形参名和形参值的简单对照表（name-value）
-     * 
-     * @param method
-     *            方法
-     * @param args
-     *            实参集合(可为空，MethodParam的value也为空)
+     *
+     * @param method 方法
+     * @param args   实参集合(可为空，MethodParam的value也为空)
      */
     public static Map<String, Object> getFormalParamSimpleMapping(Method method, Object[] args) {
         Map<String, Object> result = Maps.newHashMap();
@@ -291,13 +293,10 @@ public class Beans {
     }
 
     /**
-     * 
      * 比较参数类型是否一致
      *
-     * @param types
-     *            asm的类型({@link Type})
-     * @param clazzes
-     *            java 类型({@link Class})
+     * @param types   asm的类型({@link Type})
+     * @param clazzes java 类型({@link Class})
      * @return
      */
     private static boolean sameType(Type[] types, Class<?>[] clazzes) {
@@ -314,7 +313,9 @@ public class Beans {
         return true;
     }
 
-    /** getMethodParamNames的缓存，key为方法名，value为形参列表 */
+    /**
+     * getMethodParamNames的缓存，key为方法名，value为形参列表
+     */
     private static final ConcurrentMap<String, String[]> METHOD_PARAMNAMES_CACHE = new ConcurrentHashMap<>();
 
     /**
@@ -366,7 +367,9 @@ public class Beans {
         }
     }
 
-    /** 获得所有可访问的字段名（包括父类）集合 */
+    /**
+     * 获得所有可访问的字段名（包括父类）集合
+     */
     public static List<String> getAllDeclaredFieldNames(Class<?> clazz) {
         BeanInfo beanInfo = getBeanInfo(clazz);
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
@@ -383,11 +386,9 @@ public class Beans {
 
     /**
      * 对比两个对象，获取差异字段集合
-     * 
-     * @param oldObject
-     *            旧对象
-     * @param newObject
-     *            新对象
+     *
+     * @param oldObject 旧对象
+     * @param newObject 新对象
      */
     public static List<FieldDidderence> contrastObject(Object oldObject, Object newObject) {
         List<FieldDidderence> result = new ArrayList<>();
@@ -417,7 +418,9 @@ public class Beans {
     static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
     private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-    /** 获得包下的所有class */
+    /**
+     * 获得包下的所有class
+     */
     public static List<Class<?>> getPackageClasses(String packageName) {
         List<Class<?>> list = Lists.newArrayList();
         String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(packageName) + "/" + DEFAULT_RESOURCE_PATTERN;
@@ -452,11 +455,10 @@ public class Beans {
 
     /**
      * 通过反射, 获得Class定义中声明的泛型参数的类型, 注意泛型必须定义在父类处 如无法找到, 返回Object.class.<br>
-     * 
-     * @param clazz
-     *            The class to introspect
+     *
+     * @param clazz The class to introspect
      * @return the first generic declaration, or Object.class if cannot be
-     *         determined
+     * determined
      */
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getClassGenericType(final Class<?> clazz) {
@@ -465,13 +467,11 @@ public class Beans {
 
     /**
      * 通过反射, 获得Class定义中声明的父类的泛型参数的类型. 如无法找到, 返回Object.class.
-     * 
-     * @param clazz
-     *            clazz The class to introspect
-     * @param index
-     *            the Index of the generic ddeclaration,start from 0.
+     *
+     * @param clazz clazz The class to introspect
+     * @param index the Index of the generic ddeclaration,start from 0.
      * @return the index generic declaration, or Object.class if cannot be
-     *         determined
+     * determined
      */
     public static Class<?> getClassGenericType(final Class<?> clazz, final int index) {
         java.lang.reflect.Type genType = clazz.getGenericSuperclass();
@@ -495,21 +495,33 @@ public class Beans {
         return (Class<?>) params[index];
     }
 
-    /** 基本类型封装类列表 */
+    /**
+     * 基本类型封装类列表
+     */
     private final static List<Class<?>> BASIC_TYPE = Dynamics.listOf(Double.class, String.class, Float.class, Byte.class, Integer.class, Character.class, Long.class, Short.class);
 
-    /** 是否是基本数据类型 */
+    /**
+     * 是否是基本数据类型
+     */
     public static boolean isBasicType(Class<?> cl) {
         return cl.isPrimitive() || BASIC_TYPE.contains(cl);
     }
 
-    /** 字段差异 */
+    /**
+     * 字段差异
+     */
     public static class FieldDidderence {
-        /** 字段名称 */
+        /**
+         * 字段名称
+         */
         private String filedName;
-        /** 字段修改前的值 */
+        /**
+         * 字段修改前的值
+         */
         private String oldValue;
-        /** 字段修改后的值 */
+        /**
+         * 字段修改后的值
+         */
         private String newValue;
 
         public String getFiledName() {

@@ -1,12 +1,12 @@
 package org.jujubeframework.util.office;
 
 import com.google.common.collect.Lists;
-import org.jujubeframework.constant.Charsets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.Validate;
+import org.jujubeframework.constant.Charsets;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Csv读取器
+ *
  * @author John Li
  */
 @Slf4j
@@ -26,7 +27,9 @@ public class CsvReader implements Iterable<List<String>> {
     private FileInputStream csvInputStream;
     private File csvFile;
     private ExcelReaderConfig config;
-    /** 工作薄的总行数 */
+    /**
+     * 工作薄的总行数
+     */
     private int rowCount;
     private List<CSVRecord> csvRecords;
     public static final Charset DEFAULT_CHARSET = Charsets.GBK;
@@ -84,7 +87,9 @@ public class CsvReader implements Iterable<List<String>> {
     }
 
     private class Itr implements Iterator<List<String>> {
-        /** 工作薄的当前行数 */
+        /**
+         * 工作薄的当前行数
+         */
         private int currentNum;
 
         @Override

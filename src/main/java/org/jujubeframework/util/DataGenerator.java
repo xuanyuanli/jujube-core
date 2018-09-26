@@ -1,20 +1,15 @@
 package org.jujubeframework.util;
 
-import java.lang.reflect.Method;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.lang.reflect.Method;
+import java.sql.Timestamp;
+import java.util.*;
+
 /**
  * 数据生成者
+ *
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

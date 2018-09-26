@@ -1,20 +1,20 @@
 package org.jujubeframework.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * 驼峰命名法转换工具
- * 
+ *
  * <pre>
  *  CamelCaseUtils.toCamelCase("orderId") == "orderId"
- *  CamelCaseUtils.toCamelCase("hello_world") == "helloWorld" 
+ *  CamelCaseUtils.toCamelCase("hello_world") == "helloWorld"
  *  CamelCaseUtils.toCapitalizeCamelCase("hello_world") == "HelloWorld"
  *  CamelCaseUtils.toUnderScoreCase("helloWorld") = "hello_world"
  * </pre>
- * 
+ *
  * @author John Li Email：jujubeframework@163.com
  */
 public class CamelCase {
@@ -22,7 +22,9 @@ public class CamelCase {
     private CamelCase() {
     }
 
-    /** 字段转换的缓存 */
+    /**
+     * 字段转换的缓存
+     */
     private static Map<String, String> underLine_fieldCache = new ConcurrentHashMap<String, String>();
     private static Map<String, String> camelCase_fieldCache = new ConcurrentHashMap<String, String>();
 

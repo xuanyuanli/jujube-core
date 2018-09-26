@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 
 /**
  * 编码常量定义
- * 
+ *
  * @author John Li
  */
 public interface Charsets {

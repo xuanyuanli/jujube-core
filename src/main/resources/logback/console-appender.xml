@@ -6,12 +6,12 @@ initialization performed by Boot
 -->
 
 <included>
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
-			<charset>utf8</charset>
-		</encoder>
-	</appender>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
     <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
     <appender name="Sentry" class="com.getsentry.raven.logback.SentryAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">

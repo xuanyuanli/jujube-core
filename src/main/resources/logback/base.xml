@@ -5,15 +5,15 @@ Base logback configuration provided for compatibility with Spring Boot 1.1
 -->
 
 <included>
-	<include resource="logback/defaults.xml" />
-	<property name="LOG_FILE" value="/data/logs/${LOG_FILE_NAME}"/>
-	<property name="LOG_FILE_MAXINDEX" value="${LOG_FILE_MAXINDEX:-5}"/>
-	<property name="LOG_FILE_MAXFILESIZE" value="${LOG_FILE_MAXFILESIZE:-10MB}"/>
-	<include resource="logback/console-appender.xml" />
-	<include resource="logback/file-appender.xml" />
-	<root level="INFO">
-		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="FILE" />
-        <appender-ref ref="Sentry" />
-	</root>
+    <include resource="logback/defaults.xml"/>
+    <property name="LOG_FILE" value="/data/logs/${LOG_FILE_NAME}"/>
+    <property name="LOG_FILE_MAXINDEX" value="${LOG_FILE_MAXINDEX:-5}"/>
+    <property name="LOG_FILE_MAXFILESIZE" value="${LOG_FILE_MAXFILESIZE:-10MB}"/>
+    <include resource="logback/console-appender.xml"/>
+    <include resource="logback/file-appender.xml"/>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="Sentry"/>
+    </root>
 </included>

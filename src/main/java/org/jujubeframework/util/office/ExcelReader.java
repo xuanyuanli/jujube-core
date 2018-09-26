@@ -1,13 +1,5 @@
 package org.jujubeframework.util.office;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
@@ -20,15 +12,27 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 /**
  * Excel读取器
- * 
+ *
  * @author John Li Email：jujubeframework@163.com
  */
 public class ExcelReader implements Iterable<List<String>> {
-    /** 一个Sheet工作薄 */
+    /**
+     * 一个Sheet工作薄
+     */
     private Sheet sheet;
-    /** 工作薄的总行数 */
+    /**
+     * 工作薄的总行数
+     */
     private int rowCount;
     private ExcelReaderConfig config;
     private File currentExcel;
@@ -39,11 +43,9 @@ public class ExcelReader implements Iterable<List<String>> {
 
     /**
      * 构造函数
-     * 
-     * @param file
-     *            Excel文件
-     * @param sheetIndex
-     *            要解析的sheetIndex,从0开始
+     *
+     * @param file       Excel文件
+     * @param sheetIndex 要解析的sheetIndex,从0开始
      */
     public ExcelReader(File file, int sheetIndex, ExcelReaderConfig config) {
         Validate.notNull(config);
@@ -158,12 +160,14 @@ public class ExcelReader implements Iterable<List<String>> {
         return list;
     }
 
-    /** 获得单元格内容 */
+    /**
+     * 获得单元格内容
+     */
     private String getCellContent(Cell cell) {
         String cellContent = "";
         if (cell != null) {
             // 如果有表格中单元格有公式，cell.toString()得不到正确结果。这里需要做下处理。需要注意：公式计算出来的数字大多为浮点型，需要客户端去精确
-            if (cell.getCellTypeEnum()== CellType.FORMULA) {
+            if (cell.getCellTypeEnum() == CellType.FORMULA) {
                 try {
                     CellValue cellValue = evaluator.evaluate(cell);
                     cellContent = cellValue.formatAsString();
@@ -187,7 +191,9 @@ public class ExcelReader implements Iterable<List<String>> {
     }
 
     private class Itr implements Iterator<List<String>> {
-        /** 工作薄的当前行数 */
+        /**
+         * 工作薄的当前行数
+         */
         private int currentNum;
 
         @Override

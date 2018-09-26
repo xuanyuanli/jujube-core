@@ -1,16 +1,14 @@
 package org.jujubeframework.support.ram;
 
-import org.jujubeframework.util.RamUsageEstimator;
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.jujubeframework.util.BeansTest;
+import org.jujubeframework.util.DataGenerator;
+import org.jujubeframework.util.RamUsageEstimator;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.jujubeframework.util.BeansTest;
-import org.junit.Test;
-
-import org.jujubeframework.util.DataGenerator;
 
 public class RamUsageEstimatorTest {
 

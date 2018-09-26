@@ -1,24 +1,18 @@
 package org.jujubeframework.util.net;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 
+import java.io.*;
+
 /**
  * ftp上传与下载工具
  * <p>
  * 使用完之后，记得disconnect
+ *
  * @author John Li
  */
 @Slf4j
@@ -102,14 +96,12 @@ public class Ftps {
     /**
      * 下载文件
      *
-     * @param ftpFilePath
-     *            ftp文件地址
-     * @param localFilePath
-     *            下载到本地的地址
+     * @param ftpFilePath   ftp文件地址
+     * @param localFilePath 下载到本地的地址
      */
     public boolean download(String ftpFilePath, String localFilePath) {
         boolean result = true;
-        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(localFilePath))){
+        try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(localFilePath))) {
             result = ftpClient.retrieveFile(ftpFilePath, fos);
             fos.flush();
         } catch (IOException e) {
@@ -121,11 +113,9 @@ public class Ftps {
 
     /**
      * 重命名文件
-     * 
-     * @param oldFileName
-     *            原文件名
-     * @param newFileName
-     *            新文件名
+     *
+     * @param oldFileName 原文件名
+     * @param newFileName 新文件名
      */
     public boolean renameFile(String oldFileName, String newFileName) {
         try {
@@ -138,9 +128,8 @@ public class Ftps {
 
     /**
      * 在服务器上创建一个文件夹
-     * 
-     * @param dir
-     *            文件夹名称，不能含有特殊字符，如 \ 、/ 、: 、* 、?、 "、 &lt;、&gt;...
+     *
+     * @param dir 文件夹名称，不能含有特殊字符，如 \ 、/ 、: 、* 、?、 "、 &lt;、&gt;...
      */
     public boolean makeDirectory(String dir) {
         try {
@@ -185,14 +174,12 @@ public class Ftps {
     /**
      * 上传文件到服务器
      *
-     * @param localFile
-     *            本地文件
-     * @param destPath
-     *            服务器绝对路径（包含文件名）
+     * @param localFile 本地文件
+     * @param destPath  服务器绝对路径（包含文件名）
      */
     public boolean uploadFile(File localFile, final String destPath) {
         boolean flag = true;
-        try (InputStream  localFileInput = new BufferedInputStream(new FileInputStream(localFile))){
+        try (InputStream localFileInput = new BufferedInputStream(new FileInputStream(localFile))) {
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
 
@@ -224,8 +211,7 @@ public class Ftps {
     /**
      * 设置ftp服务端的操作系统
      *
-     * @param systemKey
-     *            参考：FTPClientConfig.SYST_*
+     * @param systemKey 参考：FTPClientConfig.SYST_*
      */
     public void setSystemKey(String systemKey) {
         this.systemKey = systemKey;
@@ -233,9 +219,8 @@ public class Ftps {
 
     /**
      * 设置服务器语言编码
-     * 
-     * @param serverLanguageCode
-     *            默认为FTP.DEFAULT_CONTROL_ENCODING
+     *
+     * @param serverLanguageCode 默认为FTP.DEFAULT_CONTROL_ENCODING
      */
     public void setServerLanguageCode(String serverLanguageCode) {
         this.serverLanguageCode = serverLanguageCode;
@@ -243,9 +228,8 @@ public class Ftps {
 
     /**
      * 设置bufferSize
-     * 
-     * @param bufSize
-     *            默认为1024
+     *
+     * @param bufSize 默认为1024
      */
     public void setBufSize(int bufSize) {
         this.bufSize = bufSize;
@@ -253,9 +237,8 @@ public class Ftps {
 
     /**
      * 设置fileType，可选值：FTP.*_FILE_TYPE
-     * 
-     * @param fileType
-     *            默认为二进制传输
+     *
+     * @param fileType 默认为二进制传输
      */
     public void setFileType(int fileType) {
         this.fileType = fileType;
@@ -264,8 +247,7 @@ public class Ftps {
     /**
      * 设置root工作目录
      *
-     * @param rootWorkingDirectory
-     *            默认ftp服务器端操作系统为linux，所以root工作目录为"/"
+     * @param rootWorkingDirectory 默认ftp服务器端操作系统为linux，所以root工作目录为"/"
      */
     public void setRootWorkingDirectory(String rootWorkingDirectory) {
         this.rootWorkingDirectory = rootWorkingDirectory;

@@ -1,18 +1,13 @@
 package org.jujubeframework.util.web;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.Map.Entry;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
+import com.google.common.net.HttpHeaders;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
+import org.jujubeframework.util.Collections3;
+import org.jujubeframework.util.Texts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpRequest;
@@ -23,14 +18,17 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.WebUtils;
 
-import com.google.common.base.Charsets;
-import com.google.common.net.HttpHeaders;
-import org.jujubeframework.util.Collections3;
-import org.jujubeframework.util.Texts;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Servlet相关工具类
- * 
+ *
  * @author John Li
  */
 public class Servlets {
@@ -79,11 +77,10 @@ public class Servlets {
 
     /**
      * 根据浏览器If-Modified-Since Header, 计算文件是否已被修改.
-     * 
+     * <p>
      * 如果无修改, checkIfModify返回false ,设置304 not modify status.
-     * 
-     * @param lastModified
-     *            内容的最后修改时间.
+     *
+     * @param lastModified 内容的最后修改时间.
      */
     public static boolean checkIfModifiedSince(HttpServletRequest request, HttpServletResponse response, long lastModified) {
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
@@ -97,11 +94,10 @@ public class Servlets {
 
     /**
      * 根据浏览器 If-None-Match Header, 计算Etag是否已无效.
-     * 
+     * <p>
      * 如果Etag有效, checkIfNoneMatch返回false, 设置304 not modify status.
-     * 
-     * @param etag
-     *            内容的ETag.
+     *
+     * @param etag 内容的ETag.
      */
     public static boolean checkIfNoneMatchEtag(HttpServletRequest request, HttpServletResponse response, String etag) {
         String headerValue = request.getHeader(HttpHeaders.IF_NONE_MATCH);
@@ -132,9 +128,8 @@ public class Servlets {
 
     /**
      * 设置让浏览器弹出下载对话框的Header.
-     * 
-     * @param fileName
-     *            下载后的文件名.
+     *
+     * @param fileName 下载后的文件名.
      */
     public static void setFileDownloadHeader(HttpServletRequest request, HttpServletResponse response, String fileName) {
         // 中文文件名支持
@@ -218,7 +213,9 @@ public class Servlets {
         return ip;
     }
 
-    /** 是否是无效ip */
+    /**
+     * 是否是无效ip
+     */
     private static boolean isInvalidIp(String ip) {
         return ip.trim().startsWith("127.0.0") || ip.startsWith("0:0:0");
     }
@@ -227,9 +224,9 @@ public class Servlets {
      * 获得客户端浏览器<br>
      * 参考了Jquery1.8的实现
      */
-    public static String getBrowser(final  HttpServletRequest request) {
+    public static String getBrowser(final HttpServletRequest request) {
         HashSet<String> set = new HashSet<String>(Collections3.enumerationToList(request.getHeaderNames()));
-        Map<String,String> map = Maps.asMap(set, name -> request.getHeader(name));
+        Map<String, String> map = Maps.asMap(set, name -> request.getHeader(name));
         return getBrowser(map);
     }
 
@@ -270,7 +267,7 @@ public class Servlets {
 
     /**
      * 取得带相同前缀的Request Parameters, copy from spring WebUtils.
-     * 
+     * <p>
      * 返回的结果的Parameter名已去除前缀.
      */
     public static Map<String, Object> getParametersStartingWith(ServletRequest request, String prefix) {
@@ -303,7 +300,7 @@ public class Servlets {
 
     /**
      * 组合Parameters生成Query String的Parameter部分, 并在paramter name上加上prefix.
-     * 
+     *
      * @see #getParametersStartingWith
      */
     public static String encodeParameterStringWithPrefix(Map<String, Object> params, String prefix) {
@@ -339,32 +336,42 @@ public class Servlets {
         return queryStringBuilder.toString();
     }
 
-    /** 对参数进行encodeURIComponent */
+    /**
+     * 对参数进行encodeURIComponent
+     */
     public static String encodeUrlParam(Object param) {
         String value = String.valueOf(param);
         return UriUtils.encode(value, "utf-8");
     }
 
 
-    /** 获得完整的访问Url */
+    /**
+     * 获得完整的访问Url
+     */
     public static String getFullUrl(HttpServletRequest request) {
         return request.getRequestURL().append("?").append(request.getQueryString()).toString();
     }
 
-    /** java版的decodeURIComponent */
+    /**
+     * java版的decodeURIComponent
+     */
     public static String decodeURIComponent(String url) {
         url = UriUtils.decode(url, "UTF-8");
         url = StringEscapeUtils.unescapeHtml4(url);
         return url;
     }
 
-    /** java版的encodeURIComponent */
+    /**
+     * java版的encodeURIComponent
+     */
     public static String encodeURIComponent(String url) {
         return StringEscapeUtils.unescapeHtml4(UriUtils.encode(url, "UTF-8"));
     }
 
 
-    /** 获得当前线程的Request */
+    /**
+     * 获得当前线程的Request
+     */
     public static HttpServletRequest getCurrentHttpServletRequest() {
         ServletRequestAttributes servletRequestAttributes = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
         if (servletRequestAttributes != null) {
@@ -373,7 +380,9 @@ public class Servlets {
         return null;
     }
 
-    /** 获得Map版Header */
+    /**
+     * 获得Map版Header
+     */
     public static Map<String, String> getFormatHeader(HttpServletRequest request) {
         List<String> headerNames = Collections3.enumerationToList(request.getHeaderNames());
         Map<String, String> result = new HashMap<>(headerNames.size());
@@ -383,7 +392,9 @@ public class Servlets {
         return result;
     }
 
-    /** 获得Map版Paramter */
+    /**
+     * 获得Map版Paramter
+     */
     public static Map<String, String> getFormatParamter(HttpServletRequest request) {
         Map<String, String[]> pMap = request.getParameterMap();
         Map<String, String> result = new HashMap<>(pMap.size());
@@ -394,7 +405,9 @@ public class Servlets {
         return result;
     }
 
-    /** request的Accept是否是html */
+    /**
+     * request的Accept是否是html
+     */
     public static boolean requestAcceptIsHtml(HttpServletRequest request) {
         HttpRequest httpRequest = new ServletServerHttpRequest(request);
         List<MediaType> accept = httpRequest.getHeaders().getAccept();

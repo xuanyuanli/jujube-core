@@ -9,7 +9,9 @@ import org.jujubeframework.util.Beans;
  */
 public class Profiles {
 
-    /** H2的驱动 */
+    /**
+     * H2的驱动
+     */
     public static final String H2_DRIVER_CLASS_NAME = "org.h2.Driver";
 
     private static final String SPRING_PROFILES_ACTIVE = "spring.profiles.active";
@@ -25,7 +27,9 @@ public class Profiles {
         return System.getProperty(SPRING_PROFILES_ACTIVE);
     }
 
-    /** 是否是测试环境 */
+    /**
+     * 是否是测试环境
+     */
     public static boolean isTestProfile() {
         try {
             Beans.forName(H2_DRIVER_CLASS_NAME);

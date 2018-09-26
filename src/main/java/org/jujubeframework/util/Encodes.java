@@ -5,24 +5,23 @@
  *******************************************************************************/
 package org.jujubeframework.util;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringEscapeUtils;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * 封装各种格式的编码解码工具类.
- * 
+ * <p>
  * 1.Commons-Codec的 hex/base64 编码 2.自制的base62 编码 3.Commons-Lang的xml/html escape
  * 4.JDK提供的URLEncoder
- * 
+ *
  * @author calvin
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

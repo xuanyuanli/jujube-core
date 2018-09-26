@@ -1,10 +1,10 @@
 package org.jujubeframework.util;
 
-import org.jujubeframework.lang.Record;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.jujubeframework.lang.Record;
 import org.junit.Test;
 
 import java.beans.PropertyDescriptor;

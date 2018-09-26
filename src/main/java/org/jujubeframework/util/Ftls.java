@@ -1,15 +1,5 @@
 package org.jujubeframework.util;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Map;
-import java.util.Properties;
-
-import org.jujubeframework.constant.Charsets;
-import org.jujubeframework.util.support.freemarker.ClassloaderTemplateLoader;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
@@ -17,22 +7,40 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
+import org.jujubeframework.constant.Charsets;
+import org.jujubeframework.util.support.freemarker.ClassloaderTemplateLoader;
+
+import java.io.*;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * 项目的FreeMarker总体配置类。直接调用其中方法生成模板
- * 
+ *
  * @author John Li Email：jujubeframework@163.com
  */
 public class Ftls {
-    /** 模板总目录 */
+    /**
+     * 模板总目录
+     */
     private static final String FTL_DIR = "templates";
 
     private Ftls() {
     }
 
-    private static Configuration file_template_configuration;// 文件模板
-    private static Configuration string_template_configuration;// 字符串模板
-    private static StringTemplateLoader stringTemplateLoader; // 字符串模板载入器
+    /**
+     * 文件模板
+     */
+    private static Configuration file_template_configuration;
+    /**
+     * 字符串模板
+     */
+    private static Configuration string_template_configuration;
+    /**
+     * 字符串模板载入器
+     */
+    private static StringTemplateLoader stringTemplateLoader;
+
     static {
         Properties props = new Properties();
         props.put("tag_syntax", "auto_detect");
@@ -66,13 +74,10 @@ public class Ftls {
 
     /**
      * 生成模板到文件
-     * 
-     * @param templateName
-     *            模板名称
-     * @param outputPath
-     *            输出路径(绝对路径)
-     * @param root
-     *            FreeMarker数据模型
+     *
+     * @param templateName 模板名称
+     * @param outputPath   输出路径(绝对路径)
+     * @param root         FreeMarker数据模型
      */
     public static void processFileTemplateToFile(String templateName, String outputPath, Map<String, Object> root) {
         try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(Utils.createFile(outputPath)), Charsets.UTF_8);) {
@@ -84,11 +89,9 @@ public class Ftls {
 
     /**
      * 生成模板，输出到控制台
-     * 
-     * @param templateName
-     *            模板名称
-     * @param root
-     *            FreeMarker数据模型
+     *
+     * @param templateName 模板名称
+     * @param root         FreeMarker数据模型
      */
     public static void processFileTemplateToConsole(String templateName, Map<String, Object> root) {
         processFileTemplateTo(templateName, root, new OutputStreamWriter(System.out));
@@ -96,11 +99,9 @@ public class Ftls {
 
     /**
      * 生成模板，输出到控制台
-     * 
-     * @param templateName
-     *            模板名称
-     * @param root
-     *            FreeMarker数据模型
+     *
+     * @param templateName 模板名称
+     * @param root         FreeMarker数据模型
      */
     public static String processFileTemplateToString(String templateName, Map<String, Object> root) {
         return processTemplateToString(getFileTemplate(templateName), root);
@@ -112,11 +113,9 @@ public class Ftls {
 
     /**
      * 处理模板源文件，生成内容
-     * 
-     * @param ftlSource
-     *            模板源码
-     * @param map
-     *            root
+     *
+     * @param ftlSource 模板源码
+     * @param map       root
      */
     public static String processStringTemplateToString(String ftlSource, Map<String, Object> map) {
         String defaultFtlName = "default_" + ftlSource.hashCode();
@@ -145,7 +144,7 @@ public class Ftls {
 
     /**
      * 生成模板，输出到...
-     * 
+     *
      * @author John Li Email：jujubeframework@163.com
      */
     private static void processTemplateTo(Template template, Map<String, Object> root, Writer out) {

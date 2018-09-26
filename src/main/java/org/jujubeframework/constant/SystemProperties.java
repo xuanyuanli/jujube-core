@@ -5,6 +5,7 @@ import java.util.Collections;
 
 /**
  * 系统属性
+ *
  * @author John Li
  */
 public class SystemProperties {
@@ -12,46 +13,82 @@ public class SystemProperties {
     private SystemProperties() {
     }
 
-    /** 项目目录 */
+    /**
+     * 项目目录
+     */
     public static final String PROJECT_DIR = System.getProperty("user.dir");
-    /** 操作系统位数 */
+    /**
+     * 操作系统位数
+     */
     public static final String OS_ARCH = System.getProperty("os.arch");
-    /** 系统临时目录 */
+    /**
+     * 系统临时目录
+     */
     public static final String TMPDIR = System.getProperty("java.io.tmpdir");
-    /** 操作系统名称 */
+    /**
+     * 操作系统名称
+     */
     public static final String OS_NAME = System.getProperty("os.name");
-    /** 系统编码 */
+    /**
+     * 系统编码
+     */
     public static final String OS_ENCODING = System.getProperty("sun.jnu.encoding");
-    /** 用户家目录 */
+    /**
+     * 用户家目录
+     */
     public static final String USER_HOME = System.getProperty("user.home");
-    /** 用户名 */
+    /**
+     * 用户名
+     */
     public static final String USER_NAME = System.getProperty("user.name");
-    /** 项目用到的 class path 集合 */
+    /**
+     * 项目用到的 class path 集合
+     */
     public static final String CLASS_PATH = System.getProperty("java.class.path");
-    /** 用户所在地语言 */
+    /**
+     * 用户所在地语言
+     */
     public static final String USER_LANGUAGE = System.getProperty("user.language");
-    /** 文件分隔符 */
+    /**
+     * 文件分隔符
+     */
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
-    /** 图形桌面名称 */
+    /**
+     * 图形桌面名称
+     */
     public static final String OS_DESKTOP = System.getProperty("sun.desktop");
 
-    /** JVM vendor info. */
+    /**
+     * JVM vendor info.
+     */
     public static final String JVM_VENDOR = System.getProperty("java.vm.vendor");
     public static final String JVM_VERSION = System.getProperty("java.vm.version");
     public static final String JVM_NAME = System.getProperty("java.vm.name");
 
-    /** The value of <tt>System.getProperty("java.version")</tt>. **/
+    /**
+     * The value of <tt>System.getProperty("java.version")</tt>.
+     **/
     public static final String JAVA_VERSION = System.getProperty("java.version");
 
-    /** True iff running on Linux. */
+    /**
+     * True iff running on Linux.
+     */
     public static final boolean LINUX = OS_NAME.startsWith("Linux");
-    /** True iff running on Windows. */
+    /**
+     * True iff running on Windows.
+     */
     public static final boolean WINDOWS = OS_NAME.startsWith("Windows");
-    /** True iff running on SunOS. */
+    /**
+     * True iff running on SunOS.
+     */
     public static final boolean SUN_OS = OS_NAME.startsWith("SunOS");
-    /** True iff running on Mac OS X */
+    /**
+     * True iff running on Mac OS X
+     */
     public static final boolean MAC_OS_X = OS_NAME.startsWith("Mac OS X");
-    /** True iff running on FreeBSD */
+    /**
+     * True iff running on FreeBSD
+     */
     public static final boolean FREE_BSD = OS_NAME.startsWith("FreeBSD");
 
     public static final String OS_VERSION = System.getProperty("os.version");
@@ -59,7 +96,9 @@ public class SystemProperties {
 
     public static final boolean JRE_IS_MINIMUM_JAVA8;
 
-    /** True iff running on a 64bit JVM */
+    /**
+     * True iff running on a 64bit JVM
+     */
     public static final boolean JRE_IS_64BIT;
 
     static {

@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 /**
  * 因为Pattern会在初始化的时候进行编译，所以最好缓存一下
+ *
  * @author John Li
  */
 public class PatternHolder {

@@ -1,15 +1,15 @@
 package org.jujubeframework.util;
 
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.math.NumberUtils;
-
 /**
  * 算数工具类(calculate)<br>
- * 
+ * <p>
  * Math类常用函数：
  * <ul>
  * <li>pow:幂运算</li>
@@ -17,6 +17,7 @@ import org.apache.commons.lang3.math.NumberUtils;
  * <li>floor:地板，12.6 = 12.0</li>
  * <li>ceil:天花板，12.3 = 13.0</li>
  * </ul>
+ *
  * @author John Li
  */
 @SuppressWarnings("AlibabaUndefineMagicConstant")
@@ -84,13 +85,10 @@ public class Calcs {
 
     /**
      * ：加法运算
-     * 
-     * @param str1
-     *            被加数
-     * @param str2
-     *            加数
-     * @param iScale
-     *            精确度（小数点后保留位数）
+     *
+     * @param str1   被加数
+     * @param str2   加数
+     * @param iScale 精确度（小数点后保留位数）
      * @return
      */
     public static String add(String str1, String str2, int iScale) {
@@ -116,11 +114,9 @@ public class Calcs {
 
     /**
      * ：加法运算
-     * 
-     * @param str1
-     *            被加数
-     * @param str2
-     *            加数
+     *
+     * @param str1 被加数
+     * @param str2 加数
      * @return
      */
     public static String add(String str1, String str2) {
@@ -129,13 +125,10 @@ public class Calcs {
 
     /**
      * ：减法
-     * 
-     * @param str1
-     *            被减数
-     * @param str2
-     *            减数
-     * @param iScale
-     *            精确度（小数点后保留位数）
+     *
+     * @param str1   被减数
+     * @param str2   减数
+     * @param iScale 精确度（小数点后保留位数）
      * @return
      */
     public static String sub(String str1, String str2, int iScale) {
@@ -154,11 +147,9 @@ public class Calcs {
 
     /**
      * ：减法运算
-     * 
-     * @param str1
-     *            被减数
-     * @param str2
-     *            减数
+     *
+     * @param str1 被减数
+     * @param str2 减数
      * @return
      */
     public static String sub(String str1, String str2) {
@@ -174,13 +165,10 @@ public class Calcs {
 
     /**
      * ：乘法运算 指定保留到小数点后位数
-     * 
-     * @param str1
-     *            被乘数
-     * @param str2
-     *            乘数
-     * @param iScale
-     *            精确度（小数点后保留位数）
+     *
+     * @param str1   被乘数
+     * @param str2   乘数
+     * @param iScale 精确度（小数点后保留位数）
      * @return
      */
     public static String mul(String str1, String str2, int iScale) {
@@ -214,13 +202,10 @@ public class Calcs {
 
     /**
      * ：除法运算 指定保留到小数点后位数
-     * 
-     * @param str1
-     *            被除数
-     * @param str2
-     *            除数
-     * @param iScale
-     *            精确度（小数点后保留位数）
+     *
+     * @param str1   被除数
+     * @param str2   除数
+     * @param iScale 精确度（小数点后保留位数）
      * @return
      */
     @SuppressWarnings("AlibabaUndefineMagicConstant")
@@ -254,7 +239,9 @@ public class Calcs {
         return NumberUtils.toDouble(div(String.valueOf(str1), String.valueOf(str2), iScale));
     }
 
-    /** 计算平均数 */
+    /**
+     * 计算平均数
+     */
     public static double getAverage(List<Double> list) {
         double sum = 0;
         for (int i = 0; i < list.size(); i++) {
@@ -263,7 +250,9 @@ public class Calcs {
         return sum / list.size();
     }
 
-    /** 计算中位数 */
+    /**
+     * 计算中位数
+     */
     public static double getMedian(List<Double> list) {
         Collections.sort(list);
         if (list.size() % TWO == 0) {

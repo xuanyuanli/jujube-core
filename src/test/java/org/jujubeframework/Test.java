@@ -1,7 +1,6 @@
 package org.jujubeframework;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.jujubeframework.util.web.Servlets;
 
 import java.text.DecimalFormat;
 

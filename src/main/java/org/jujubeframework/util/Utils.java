@@ -1,46 +1,26 @@
 package org.jujubeframework.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.management.ManagementFactory;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.Socket;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-
+import com.google.common.io.FileWriteMode;
+import com.google.common.io.Files;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import com.google.common.io.FileWriteMode;
-import com.google.common.io.Files;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.net.*;
+import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.*;
 
 /**
  * 公共工具方法集合
@@ -61,9 +41,8 @@ public class Utils {
 
     /**
      * 获取所有classpath下对应名称的Properties文件属性
-     * 
-     * @param fileName
-     *            相对于classpath的文件位置
+     *
+     * @param fileName 相对于classpath的文件位置
      */
     public static Properties getProperties(String fileName) {
         if (StringUtils.isBlank(fileName)) {
@@ -88,9 +67,8 @@ public class Utils {
 
     /**
      * 获取当前classpath下对应名称的Properties文件属性
-     * 
-     * @param fileName
-     *            相对于classpath的文件位置
+     *
+     * @param fileName 相对于classpath的文件位置
      */
     public static Properties getCurrentClasspathProperties(String fileName) {
         if (StringUtils.isBlank(fileName)) {
@@ -110,7 +88,9 @@ public class Utils {
         return properties;
     }
 
-    /** 获得classpath*下的指定资源 */
+    /**
+     * 获得classpath*下的指定资源
+     */
     public static Resource[] getClassPathAllResources(String resourceName) {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         Resource[] resources = null;
@@ -121,7 +101,9 @@ public class Utils {
         return resources;
     }
 
-    /** 获得classpath下的指定资源 */
+    /**
+     * 获得classpath下的指定资源
+     */
     public static Resource getClassPathResources(String resourceName) {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         Resource[] resources = null;
@@ -139,14 +121,18 @@ public class Utils {
         throw new RuntimeException(e);
     }
 
-    /** 获得异常堆栈信息 */
+    /**
+     * 获得异常堆栈信息
+     */
     public static String exceptionToString(Exception exception) {
         StringWriter writer = new StringWriter();
         exception.printStackTrace(new PrintWriter(writer));
         return writer.toString();
     }
 
-    /** 获得异常堆栈信息 */
+    /**
+     * 获得异常堆栈信息
+     */
     public static String exceptionToString(Exception exception, int len) {
         String data = exceptionToString(exception);
         if (data != null && data.length() > len) {
@@ -164,7 +150,9 @@ public class Utils {
         return myformat.format(number);
     }
 
-    /** 创建目录 */
+    /**
+     * 创建目录
+     */
     public static File createDir(String filePath) {
         if (StringUtils.isBlank(filePath)) {
             throw new IllegalArgumentException("文件路径不能为空");
@@ -178,9 +166,8 @@ public class Utils {
 
     /**
      * 创建文件。如果上级路径不存在，则创建路径；如果文件不存在，则创建文件
-     * 
-     * @param filePath
-     *            文件绝对路径
+     *
+     * @param filePath 文件绝对路径
      * @return
      */
     public static File createFile(String filePath) {
@@ -249,7 +236,9 @@ public class Utils {
         return cl;
     }
 
-    /** 获得某个class所在的jar所在的目录（例如打包A项目为jar，获取的就是A.jar所在的目录） */
+    /**
+     * 获得某个class所在的jar所在的目录（例如打包A项目为jar，获取的就是A.jar所在的目录）
+     */
     public static String getJarHome(Class<?> cl) {
         String path = cl.getProtectionDomain().getCodeSource().getLocation().getFile();
         File jarFile = new File(path);
@@ -276,7 +265,9 @@ public class Utils {
         }
     }
 
-    /** 获得当前项目路径（只限于Eclipse中管用） */
+    /**
+     * 获得当前项目路径（只限于Eclipse中管用）
+     */
     public static String getProjectPath() {
         File dir = Utils.getCurrentClasspath();
         if (dir != null) {
@@ -311,7 +302,9 @@ public class Utils {
         return result;
     }
 
-    /** 对数组进行trim，摒弃数组中的空值 */
+    /**
+     * 对数组进行trim，摒弃数组中的空值
+     */
     public static String[] trim(String[] params) {
         List<String> result = new ArrayList<>();
         for (String string : params) {
@@ -338,31 +331,42 @@ public class Utils {
         return map;
     }
 
-    /** 根据Map生成sign。规则：key按照字典排序，value组合在一起用md5加密 */
+    /**
+     * 根据Map生成sign。规则：key按照字典排序，value组合在一起用md5加密
+     */
     public static String generateSignByMap(Map<String, String> map) {
         List<String> listKey = new ArrayList<String>();
         listKey.addAll(map.keySet());
         listKey.remove("sign");
         Collections.sort(listKey);
-        String paramValue = "";// 需要加密的字符串
+        // 需要加密的字符串
+        String paramValue = "";
         for (String key : listKey) {
             paramValue += map.get(key);
         }
         return DigestUtils.md5Hex(paramValue);
     }
 
-    /** 是否是Jar中的文件 */
+    /**
+     * 是否是Jar中的文件
+     */
     public static boolean isJarFile(URL url) {
         return "jar".equals(url.getProtocol());
     }
 
-    /** One kilobyte bytes. */
+    /**
+     * One kilobyte bytes.
+     */
     public static final long ONE_KB = 1024;
 
-    /** One megabyte bytes. */
+    /**
+     * One megabyte bytes.
+     */
     public static final long ONE_MB = ONE_KB * ONE_KB;
 
-    /** One gigabyte bytes. */
+    /**
+     * One gigabyte bytes.
+     */
     public static final long ONE_GB = ONE_KB * ONE_MB;
 
     /**
@@ -387,15 +391,20 @@ public class Utils {
         }
     }
 
-    /** 获得当前jvm的标识 */
+    /**
+     * 获得当前jvm的标识
+     */
     public static String getJVMFlag() {
         return ManagementFactory.getRuntimeMXBean().getName();
     }
 
-    /** 获取本地MAC地址的方法 */
+    /**
+     * 获取本地MAC地址的方法
+     */
     public static String getLocalMacAddress() {
         try {
-            InetAddress ia = InetAddress.getLocalHost();// 获取本地IP对象
+            // 获取本地IP对象
+            InetAddress ia = InetAddress.getLocalHost();
             // 获得网络接口对象（即网卡），并得到mac地址，mac地址存在于一个byte数组中。
             byte[] mac = NetworkInterface.getByInetAddress(ia).getHardwareAddress();
 
@@ -416,7 +425,9 @@ public class Utils {
         }
     }
 
-    /** 获得主机名 */
+    /**
+     * 获得主机名
+     */
     public static String getHostName() {
         InetAddress netAddress;
         try {
@@ -433,7 +444,9 @@ public class Utils {
         }
     }
 
-    /** 端口是否可用 */
+    /**
+     * 端口是否可用
+     */
     public static boolean isPortAvailable(int port) {
         try {
             bindPort("0.0.0.0", port);
@@ -444,7 +457,9 @@ public class Utils {
         }
     }
 
-    /** 判断ip是否是本地IP */
+    /**
+     * 判断ip是否是本地IP
+     */
     public static boolean isLocalIp(String qip) {
         try {
             Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -467,7 +482,9 @@ public class Utils {
         return false;
     }
 
-    /** 把number转换为string，非科学计数法 */
+    /**
+     * 把number转换为string，非科学计数法
+     */
     public static String numberToString(Number value) {
         // 格式化设置
         DecimalFormat decimalFormat = new DecimalFormat("###########.##########");
@@ -475,7 +492,9 @@ public class Utils {
         return decimalFormat.format(value);
     }
 
-    /** 此Class是否从jar中启动 */
+    /**
+     * 此Class是否从jar中启动
+     */
     public static boolean isJarStartByClass(Class<?> cl) {
         return "jar".equals(cl.getResource(cl.getSimpleName() + ".class").getProtocol());
     }

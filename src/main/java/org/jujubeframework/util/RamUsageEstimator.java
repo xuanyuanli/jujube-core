@@ -280,17 +280,19 @@ public final class RamUsageEstimator {
         }
     }
 
-    // Object with just one field to determine the object header size by getting
-    // the offset of the dummy field:
-    @SuppressWarnings("unused")
+    /**
+     * Object with just one field to determine the object header size by getting
+     * the offset of the dummy field:
+     */
     private static final class DummyOneFieldObject {
         public byte base;
     }
 
-    // Another test object for checking, if the difference in offsets of dummy1
-    // and dummy2 is 8 bytes.
-    // Only then we can be sure that those are real, unscaled offsets:
-    @SuppressWarnings("unused")
+    /**
+     * Another test object for checking, if the difference in offsets of dummy1
+     * and dummy2 is 8 bytes.
+     * Only then we can be sure that those are real, unscaled offsets:
+     */
     private static final class DummyTwoLongObject {
         public long dummy1, dummy2;
     }
@@ -453,7 +455,7 @@ public final class RamUsageEstimator {
         return alignObjectSize(size);
     }
 
-    /*
+    /**
      * Non-recursive version of object descend. This consumes more memory than
      * recursive in-depth traversal but prevents stack overflows on long chains
      * of objects or complex graphs (a max. recursion depth on my machine was
@@ -727,7 +729,8 @@ public final class RamUsageEstimator {
             Object existing;
             while ((existing = keys[slot]) != null) {
                 if (e == existing) {
-                    return false; // already found.
+                    // already found.
+                    return false;
                 }
                 slot = (slot + 1) & mask;
             }

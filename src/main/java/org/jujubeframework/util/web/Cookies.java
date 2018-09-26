@@ -1,15 +1,13 @@
 package org.jujubeframework.util.web;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.Validate;
+import org.jujubeframework.util.Dates;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.Validate;
-
-import org.jujubeframework.util.Dates;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * @author John Li
@@ -37,9 +35,8 @@ public class Cookies {
 
     /**
      * 添加Cookie
-     * 
-     * @param maxAge
-     *            存活时间，以秒为单位
+     *
+     * @param maxAge 存活时间，以秒为单位
      */
     public static void addCookie(HttpServletResponse response, String key, String value, int maxAge) {
         Validate.notBlank(key);

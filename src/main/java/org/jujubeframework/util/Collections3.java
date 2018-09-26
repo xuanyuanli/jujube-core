@@ -1,21 +1,7 @@
 package org.jujubeframework.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.ComparatorUtils;
@@ -23,8 +9,9 @@ import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * 集合工具类。区别于jdk的Collections和guava的Collections2
@@ -38,11 +25,9 @@ public class Collections3 {
      * 提取集合中的对象的一个属性(通过Getter函数), 组合成List&lt;String&gt;.
      * <br>
      * 不同于Collections3，这里返回String集合
-     * 
-     * @param collection
-     *            来源集合.
-     * @param propertyName
-     *            要提取的属性名.
+     *
+     * @param collection   来源集合.
+     * @param propertyName 要提取的属性名.
      */
     public static List<String> extractToListString(final Collection<?> collection, final String propertyName) {
         List<String> list = new ArrayList<>(collection.size());
@@ -60,14 +45,12 @@ public class Collections3 {
 
     /**
      * 依据某个字段对集合进行排序,获取字段值的时候采用getProperty方式
-     * @param list
-     *            待排序的集合
-     * @param fieldName
-     *            依据这个字段进行排序
-     * @param asc
-     *            如果为true，是正序；为false，为倒序
+     *
+     * @param list      待排序的集合
+     * @param fieldName 依据这个字段进行排序
+     * @param asc       如果为true，是正序；为false，为倒序
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static void sort(List list, String fieldName, boolean asc) {
         if (list == null || list.size() == 0) {
             return;
@@ -87,12 +70,10 @@ public class Collections3 {
 
     /**
      * 根据条件，从集合中取出一个
-     * @param coll
-     *            集合
-     * @param fieldName
-     *            字段名
-     * @param value
-     *            字段值
+     *
+     * @param coll      集合
+     * @param fieldName 字段名
+     * @param value     字段值
      */
     public static <T> T getOne(Collection<T> coll, String fieldName, Object value) {
         Validate.notNull(coll);
@@ -108,14 +89,11 @@ public class Collections3 {
 
     /**
      * 根据条件，从集合中取出符合条件的部分
-     * 
+     *
+     * @param coll      集合
+     * @param fieldName 字段名
+     * @param value     字段值
      * @author John Li Email：jujubeframework@163.com
-     * @param coll
-     *            集合
-     * @param fieldName
-     *            字段名
-     * @param value
-     *            字段值
      */
     public static <T> List<T> getPart(Collection<T> coll, String fieldName, Object value) {
         Validate.notNull(coll);
@@ -130,18 +108,15 @@ public class Collections3 {
         for (String sa : s) {
             set.add(sa);
         }
-        return set.toArray(new String[] {});
+        return set.toArray(new String[]{});
     }
 
     /**
      * 提取集合中的对象的两个属性(通过Getter函数), 组合成Map.
-     * 
-     * @param collection
-     *            来源集合.
-     * @param keyPropertyName
-     *            要提取为Map中的Key值的属性名.
-     * @param valuePropertyName
-     *            要提取为Map中的Value值的属性名.
+     *
+     * @param collection        来源集合.
+     * @param keyPropertyName   要提取为Map中的Key值的属性名.
+     * @param valuePropertyName 要提取为Map中的Value值的属性名.
      */
     public static <T> Map<Object, Object> extractToMap(final Collection<T> collection, final String keyPropertyName, final String valuePropertyName) {
         Map<Object, Object> map = new HashMap<>(collection.size());
@@ -159,13 +134,11 @@ public class Collections3 {
 
     /**
      * 提取集合中的对象的一个属性(通过Getter函数), 组合成List.
-     * 
-     * @param collection
-     *            来源集合.
-     * @param propertyName
-     *            要提取的属性名.
+     *
+     * @param collection   来源集合.
+     * @param propertyName 要提取的属性名.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static <T> List<T> extractToList(final Collection collection, final String propertyName) {
         if (collection == null) {
             return null;
@@ -185,15 +158,12 @@ public class Collections3 {
 
     /**
      * 提取集合中的对象的一个属性(通过Getter函数), 组合成由分割符分隔的字符串.
-     * 
-     * @param collection
-     *            来源集合.
-     * @param propertyName
-     *            要提取的属性名.
-     * @param separator
-     *            分隔符.
+     *
+     * @param collection   来源集合.
+     * @param propertyName 要提取的属性名.
+     * @param separator    分隔符.
      */
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public static String extractToString(final Collection collection, final String propertyName, final String separator) {
         List list = extractToList(collection, propertyName);
         return StringUtils.join(list, separator);
@@ -202,7 +172,7 @@ public class Collections3 {
     /**
      * 转换Collection所有元素(通过toString())为String, 中间以 separator分隔。
      */
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public static String convertToString(final Collection collection, final String separator) {
         return StringUtils.join(collection, separator);
     }
@@ -211,7 +181,7 @@ public class Collections3 {
      * 转换Collection所有元素(通过toString())为String,
      * 每个元素的前面加入prefix，后面加入postfix，如<div>mymessage</div>。
      */
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public static String convertToString(final Collection collection, final String prefix, final String postfix) {
         StringBuilder builder = new StringBuilder();
         for (Object o : collection) {
@@ -223,7 +193,7 @@ public class Collections3 {
     /**
      * 判断是否为空.
      */
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public static boolean isEmpty(Collection collection) {
         return (collection == null) || collection.isEmpty();
     }
@@ -231,7 +201,7 @@ public class Collections3 {
     /**
      * 判断是否为空.
      */
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public static boolean isEmpty(Map map) {
         return (map == null) || map.isEmpty();
     }
@@ -239,7 +209,7 @@ public class Collections3 {
     /**
      * 判断是否为空.
      */
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     public static boolean isNotEmpty(Collection collection) {
         return (collection != null) && !(collection.isEmpty());
     }
@@ -320,7 +290,9 @@ public class Collections3 {
         return list;
     }
 
-    /** 对Map键值进行反转 */
+    /**
+     * 对Map键值进行反转
+     */
     public static Map<?, ?> reversalMap(Map<?, ?> map) {
         Map<Object, Object> result = new HashMap<>(map.size());
         for (Object key : map.keySet()) {
@@ -329,7 +301,9 @@ public class Collections3 {
         return result;
     }
 
-    /** 根据key排序map */
+    /**
+     * 根据key排序map
+     */
     public static <K, V> Map<K, V> sortMapByKey(Map<K, V> map, Comparator<K> comparator) {
         Map<K, V> result = new LinkedHashMap<>();
         List<Map.Entry<K, V>> entryList = new ArrayList<Map.Entry<K, V>>(map.entrySet());
@@ -345,7 +319,9 @@ public class Collections3 {
         return result;
     }
 
-    /** 根据value排序map */
+    /**
+     * 根据value排序map
+     */
     public static <K, V> Map<K, V> sortMapByValue(Map<K, V> map, Comparator<V> comparator) {
         Map<K, V> result = new LinkedHashMap<>();
         List<Map.Entry<K, V>> entryList = new ArrayList<Map.Entry<K, V>>(map.entrySet());
@@ -361,7 +337,9 @@ public class Collections3 {
         return result;
     }
 
-    /** 是否存在集合中的字段值为 detectVal(只用于判断基本类型) */
+    /**
+     * 是否存在集合中的字段值为 detectVal(只用于判断基本类型)
+     */
     public static boolean containsFieldValue(Collection<?> source, String fieldName, Object detectVal) {
         if (source == null) {
             return false;
@@ -369,7 +347,9 @@ public class Collections3 {
         return source.stream().anyMatch(t -> detectVal.equals(Beans.getProperty(t, fieldName)));
     }
 
-    /** 根据某个字段去重 */
+    /**
+     * 根据某个字段去重
+     */
     public static <T> List<T> distinctByProperty(Collection<T> serverServices, String propertyName) {
         List<T> list = new ArrayList<>();
         Set<Object> diffArray = new HashSet<>(extractToList(serverServices, propertyName));
@@ -379,7 +359,9 @@ public class Collections3 {
         return list;
     }
 
-    /** 分组某个集合中的字段值 */
+    /**
+     * 分组某个集合中的字段值
+     */
     public static <T> Set<String> groupBy(Collection<T> data, String fieldName) {
         Set<String> set = new LinkedHashSet<>();
         for (T t : data) {

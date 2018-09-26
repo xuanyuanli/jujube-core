@@ -1,28 +1,20 @@
 package org.jujubeframework.util;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.Deflater;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * zip压缩处理
@@ -37,18 +29,22 @@ import lombok.NoArgsConstructor;
  * <li>也就是说，压缩的时候依据当前操作系统编码；而解压缩的时候要依据压缩文件来源的操作系统（即：这个文件是什么系统编码来进行压缩的，
  * 那么解压缩的时候就要使用对应的编码）</li>
  * </ul>
- * 
+ *
  * @author John Li Email：jujubeframework@163.com
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Zips {
     private final String PATH_SEPARATOR = "/";
 
-    /** 解压文件编码 */
+    /**
+     * 解压文件编码
+     */
     private Charset defaultEncoding;
 
-    /** Default compression level */
+    /**
+     * Default compression level
+     */
     public final int DEFAULT_COMPRESSION_LEVEL = Deflater.DEFAULT_COMPRESSION;
 
     private final Logger log = LoggerFactory.getLogger(Zips.class);
@@ -59,11 +55,9 @@ public class Zips {
 
     /**
      * Checks if the ZIP file contains the given entry.
-     * 
-     * @param zip
-     *            ZIP file.
-     * @param name
-     *            entry name.
+     *
+     * @param zip  ZIP file.
+     * @param name entry name.
      * @return <code>true</code> if the ZIP file contains the given entry.
      */
     public boolean containsEntry(File zip, String name) {
@@ -80,13 +74,11 @@ public class Zips {
 
     /**
      * Checks if the ZIP file contains any of the given entries.
-     * 
-     * @param zip
-     *            ZIP file.
-     * @param names
-     *            entry names.
+     *
+     * @param zip   ZIP file.
+     * @param names entry names.
      * @return <code>true</code> if the ZIP file contains any of the given
-     *         entries.
+     * entries.
      */
     public boolean containsAnyEntry(File zip, String[] names) {
         ZipFile zf = null;
@@ -109,11 +101,9 @@ public class Zips {
 
     /**
      * Unpacks a single entry from a ZIP file.
-     * 
-     * @param zip
-     *            ZIP file.
-     * @param name
-     *            entry name.
+     *
+     * @param zip  ZIP file.
+     * @param name entry name.
      * @return contents of the entry or <code>null</code> if it was not found.
      */
     public byte[] unpackEntry(File zip, String name) {
@@ -130,11 +120,9 @@ public class Zips {
 
     /**
      * Unpacks a single entry from a ZIP file.
-     * 
-     * @param zf
-     *            ZIP file.
-     * @param name
-     *            entry name.
+     *
+     * @param zf   ZIP file.
+     * @param name entry name.
      * @return contents of the entry or <code>null</code> if it was not found.
      */
     public byte[] unpackEntry(ZipFile zf, String name) {
@@ -147,35 +135,31 @@ public class Zips {
 
     /**
      * Unpacks a single entry from a ZIP file.
-     * 
-     * @param zf
-     *            ZIP file.
-     * @param name
-     *            entry name.
+     *
+     * @param zf   ZIP file.
+     * @param name entry name.
      * @return contents of the entry or <code>null</code> if it was not found.
      */
     private byte[] doUnpackEntry(ZipFile zf, String name) throws IOException {
         ZipEntry ze = zf.getEntry(name);
         if (ze == null) {
-            return null; // entry not found
+            // entry not found
+            return null;
         }
 
-        try (InputStream is = zf.getInputStream(ze)){
+        try (InputStream is = zf.getInputStream(ze)) {
             return IOUtils.toByteArray(is);
         }
     }
 
     /**
      * Unpacks a single file from a ZIP archive to a file.
-     * 
-     * @param zip
-     *            ZIP file.
-     * @param name
-     *            entry name.
-     * @param file
-     *            target file to be created or overwritten.
+     *
+     * @param zip  ZIP file.
+     * @param name entry name.
+     * @param file target file to be created or overwritten.
      * @return <code>true</code> if the entry was found and unpacked,
-     *         <code>false</code> if the entry was not found.
+     * <code>false</code> if the entry was not found.
      */
     public boolean unpackEntry(File zip, String name, File file) {
         ZipFile zf = null;
@@ -191,15 +175,12 @@ public class Zips {
 
     /**
      * Unpacks a single file from a ZIP archive to a file.
-     * 
-     * @param zf
-     *            ZIP file.
-     * @param name
-     *            entry name.
-     * @param file
-     *            target file to be created or overwritten.
+     *
+     * @param zf   ZIP file.
+     * @param name entry name.
+     * @param file target file to be created or overwritten.
      * @return <code>true</code> if the entry was found and unpacked,
-     *         <code>false</code> if the entry was not found.
+     * <code>false</code> if the entry was not found.
      */
     public boolean unpackEntry(ZipFile zf, String name, File file) {
         try {
@@ -211,23 +192,21 @@ public class Zips {
 
     /**
      * Unpacks a single file from a ZIP archive to a file.
-     * 
-     * @param zf
-     *            ZIP file.
-     * @param name
-     *            entry name.
-     * @param file
-     *            target file to be created or overwritten.
+     *
+     * @param zf   ZIP file.
+     * @param name entry name.
+     * @param file target file to be created or overwritten.
      * @return <code>true</code> if the entry was found and unpacked,
-     *         <code>false</code> if the entry was not found.
+     * <code>false</code> if the entry was not found.
      */
     private boolean doUnpackEntry(ZipFile zf, String name, File file) throws IOException {
         ZipEntry ze = zf.getEntry(name);
         if (ze == null) {
-            return false; // entry not found
+            // entry not found
+            return false;
         }
 
-        try (InputStream in = new BufferedInputStream(zf.getInputStream(ze))){
+        try (InputStream in = new BufferedInputStream(zf.getInputStream(ze))) {
             FileUtil.copy(in, file);
         }
         return true;
@@ -238,12 +217,9 @@ public class Zips {
      * <p>
      * For each entry the corresponding input stream is also passed to the
      * action. If you want to stop the loop then throw a ZipBreakException.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param action
-     *            action to be called for each entry.
-     * 
+     *
+     * @param zip    input ZIP file.
+     * @param action action to be called for each entry.
      * @see ZipEntryCallback
      * @see #iterate(File, ZipInfoCallback)
      */
@@ -255,7 +231,7 @@ public class Zips {
             Enumeration<ZipEntry> en = (Enumeration<ZipEntry>) zf.entries();
             while (en.hasMoreElements()) {
                 ZipEntry e = en.nextElement();
-                try (InputStream is = zf.getInputStream(e)){
+                try (InputStream is = zf.getInputStream(e)) {
                     action.process(is, e);
                 } catch (ZipBreakException ex) {
                     break;
@@ -274,14 +250,10 @@ public class Zips {
      * <p>
      * For each given entry the corresponding input stream is also passed to the
      * action. If you want to stop the loop then throw a ZipBreakException.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param entryNames
-     *            names of entries to iterate
-     * @param action
-     *            action to be called for each entry.
-     * 
+     *
+     * @param zip        input ZIP file.
+     * @param entryNames names of entries to iterate
+     * @param action     action to be called for each entry.
      * @see ZipEntryCallback
      * @see #iterate(File, String[], ZipInfoCallback)
      */
@@ -295,7 +267,7 @@ public class Zips {
                 if (e == null) {
                     continue;
                 }
-                try (InputStream is = zf.getInputStream(e)){
+                try (InputStream is = zf.getInputStream(e)) {
                     action.process(is, e);
                 } catch (ZipBreakException ex) {
                     break;
@@ -313,12 +285,9 @@ public class Zips {
      * <p>
      * Only the meta-data without the actual data is read. If you want to stop
      * the loop then throw a ZipBreakException.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param action
-     *            action to be called for each entry.
-     * 
+     *
+     * @param zip    input ZIP file.
+     * @param action action to be called for each entry.
      * @see ZipInfoCallback
      * @see #iterate(File, ZipEntryCallback)
      */
@@ -349,14 +318,10 @@ public class Zips {
      * <p>
      * Only the meta-data without the actual data is read. If you want to stop
      * the loop then throw a ZipBreakException.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param entryNames
-     *            names of entries to iterate
-     * @param action
-     *            action to be called for each entry.
-     * 
+     *
+     * @param zip        input ZIP file.
+     * @param entryNames names of entries to iterate
+     * @param action     action to be called for each entry.
      * @see ZipInfoCallback
      * @see #iterate(File, String[], ZipEntryCallback)
      */
@@ -386,16 +351,12 @@ public class Zips {
     /**
      * Reads the given ZIP file and executes the given action for a single
      * entry.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param name
-     *            entry name.
-     * @param action
-     *            action to be called for this entry.
+     *
+     * @param zip    input ZIP file.
+     * @param name   entry name.
+     * @param action action to be called for this entry.
      * @return <code>true</code> if the entry was found, <code>false</code> if
-     *         the entry was not found.
-     * 
+     * the entry was not found.
      * @see ZipEntryCallback
      */
     public boolean handle(File zip, String name, ZipEntryCallback action) {
@@ -405,10 +366,11 @@ public class Zips {
 
             ZipEntry ze = zf.getEntry(name);
             if (ze == null) {
-                return false; // entry not found
+                // entry not found
+                return false;
             }
 
-            try (InputStream in = new BufferedInputStream(zf.getInputStream(ze))){
+            try (InputStream in = new BufferedInputStream(zf.getInputStream(ze))) {
                 action.process(in, ze);
             }
             return true;
@@ -425,11 +387,9 @@ public class Zips {
      * Unpacks a ZIP file to the given directory.
      * <p>
      * The output directory must not be a file.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param outputDir
-     *            output directory (created automatically if not found).
+     *
+     * @param zip       input ZIP file.
+     * @param outputDir output directory (created automatically if not found).
      */
     public void unpack(File zip, final File outputDir) {
         unpack(zip, outputDir, IdentityNameMapper.INSTANCE);
@@ -439,11 +399,9 @@ public class Zips {
      * Unpacks a ZIP file to the given directory.
      * <p>
      * The output directory must not be a file.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param outputDir
-     *            output directory (created automatically if not found).
+     *
+     * @param zip       input ZIP file.
+     * @param outputDir output directory (created automatically if not found).
      */
     public void unpack(File zip, File outputDir, NameMapper mapper) {
         log.debug("Extracting '{}' into '{}'.", zip, outputDir);
@@ -456,11 +414,9 @@ public class Zips {
      * thrown.
      * <p>
      * The output directory must not be a file.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param outputDir
-     *            output directory (created automatically if not found).
+     *
+     * @param zip       input ZIP file.
+     * @param outputDir output directory (created automatically if not found).
      */
     public void unwrap(File zip, final File outputDir) {
         unwrap(zip, outputDir, IdentityNameMapper.INSTANCE);
@@ -472,11 +428,9 @@ public class Zips {
      * thrown.
      * <p>
      * The output directory must not be a file.
-     * 
-     * @param zip
-     *            input ZIP file.
-     * @param outputDir
-     *            output directory (created automatically if not found).
+     *
+     * @param zip       input ZIP file.
+     * @param outputDir output directory (created automatically if not found).
      */
     public void unwrap(File zip, File outputDir, NameMapper mapper) {
         log.debug("Unwraping '{}' into '{}'.", zip, outputDir);
@@ -485,7 +439,7 @@ public class Zips {
 
     /**
      * Unpacks each ZIP entry.
-     * 
+     *
      * @author Rein Raudjärv
      */
     private class Unpacker implements ZipEntryCallback {
@@ -524,7 +478,7 @@ public class Zips {
     /**
      * Unwraps entries excluding a single parent dir. If there are multiple
      * roots ZipException is thrown.
-     * 
+     *
      * @author Oleg Shelajev
      */
     private class Unwraper implements ZipEntryCallback {
@@ -583,10 +537,8 @@ public class Zips {
      * <p>
      * The ZIP file will be first renamed (using a temporary name). After the
      * extraction it will be deleted.
-     * 
-     * @param zip
-     *            input ZIP file as well as the target directory.
-     * 
+     *
+     * @param zip input ZIP file as well as the target directory.
      * @see #unpack(File, File)
      */
     public void explode(File zip) {
@@ -613,9 +565,8 @@ public class Zips {
 
     /**
      * Compresses the given file into a ZIP file with single entry.
-     * 
-     * @param file
-     *            file to be compressed.
+     *
+     * @param file file to be compressed.
      * @return ZIP file created.
      */
     public byte[] packEntry(File file) {
@@ -642,11 +593,9 @@ public class Zips {
      * <p>
      * The ZIP file must not be a directory and its parent directory must exist.
      * Will not include the root directory name in the archive.
-     * 
-     * @param rootDir
-     *            root directory.
-     * @param zip
-     *            ZIP file that will be created or overwritten.
+     *
+     * @param rootDir root directory.
+     * @param zip     ZIP file that will be created or overwritten.
      */
     public void pack(File rootDir, File zip) {
         pack(rootDir, zip, DEFAULT_COMPRESSION_LEVEL);
@@ -658,13 +607,10 @@ public class Zips {
      * <p>
      * The ZIP file must not be a directory and its parent directory must exist.
      * Will not include the root directory name in the archive.
-     * 
-     * @param rootDir
-     *            root directory.
-     * @param zip
-     *            ZIP file that will be created or overwritten.
-     * @param compressionLevel
-     *            compression level
+     *
+     * @param rootDir          root directory.
+     * @param zip              ZIP file that will be created or overwritten.
+     * @param compressionLevel compression level
      */
     public void pack(File rootDir, File zip, int compressionLevel) {
         pack(rootDir, zip, IdentityNameMapper.INSTANCE, compressionLevel);
@@ -676,11 +622,9 @@ public class Zips {
      * <p>
      * The ZIP file must not be a directory and its parent directory must exist.
      * Will not include the root directory name in the archive.
-     * 
-     * @param sourceDir
-     *            root directory.
-     * @param targetZipFile
-     *            ZIP file that will be created or overwritten.
+     *
+     * @param sourceDir     root directory.
+     * @param targetZipFile ZIP file that will be created or overwritten.
      */
     public void pack(final File sourceDir, final File targetZipFile, final boolean preserveRoot) {
         if (preserveRoot) {
@@ -700,25 +644,21 @@ public class Zips {
      * Compresses the given file into a ZIP file.
      * <p>
      * The ZIP file must not be a directory and its parent directory must exist.
-     * 
-     * @param fileToPack
-     *            file that needs to be zipped.
-     * @param destZipFile
-     *            ZIP file that will be created or overwritten.
+     *
+     * @param fileToPack  file that needs to be zipped.
+     * @param destZipFile ZIP file that will be created or overwritten.
      */
     public void packEntry(File fileToPack, File destZipFile) {
-        packEntries(new File[] { fileToPack }, destZipFile);
+        packEntries(new File[]{fileToPack}, destZipFile);
     }
 
     /**
      * Compresses the given files into a ZIP file.
      * <p>
      * The ZIP file must not be a directory and its parent directory must exist.
-     * 
-     * @param filesToPack
-     *            files that needs to be zipped.
-     * @param destZipFile
-     *            ZIP file that will be created or overwritten.
+     *
+     * @param filesToPack files that needs to be zipped.
+     * @param destZipFile ZIP file that will be created or overwritten.
      */
     public void packEntries(File[] filesToPack, File destZipFile) {
         log.debug("Compressing '{}' into '{}'.", filesToPack, destZipFile);
@@ -752,11 +692,9 @@ public class Zips {
      * file.
      * <p>
      * The ZIP file must not be a directory and its parent directory must exist.
-     * 
-     * @param sourceDir
-     *            root directory.
-     * @param targetZip
-     *            ZIP file that will be created or overwritten.
+     *
+     * @param sourceDir root directory.
+     * @param targetZip ZIP file that will be created or overwritten.
      */
     public void pack(File sourceDir, File targetZip, NameMapper mapper) {
         pack(sourceDir, targetZip, mapper, DEFAULT_COMPRESSION_LEVEL);
@@ -767,13 +705,10 @@ public class Zips {
      * file.
      * <p>
      * The ZIP file must not be a directory and its parent directory must exist.
-     * 
-     * @param sourceDir
-     *            root directory.
-     * @param targetZip
-     *            ZIP file that will be created or overwritten.
-     * @param compressionLevel
-     *            compression level
+     *
+     * @param sourceDir        root directory.
+     * @param targetZip        ZIP file that will be created or overwritten.
+     * @param compressionLevel compression level
      */
     public void pack(File sourceDir, File targetZip, NameMapper mapper, int compressionLevel) {
         log.debug("Compressing '{}' into '{}'.", sourceDir, targetZip);
@@ -798,15 +733,11 @@ public class Zips {
     /**
      * Compresses the given directory and all its sub-directories into a ZIP
      * file.
-     * 
-     * @param dir
-     *            root directory.
-     * @param out
-     *            ZIP output stream.
-     * @param mapper
-     *            call-back for renaming the entries.
-     * @param pathPrefix
-     *            prefix to be used for the entries.
+     *
+     * @param dir        root directory.
+     * @param out        ZIP output stream.
+     * @param mapper     call-back for renaming the entries.
+     * @param pathPrefix prefix to be used for the entries.
      */
     private void pack(File dir, ZipOutputStream out, NameMapper mapper, String pathPrefix) throws IOException {
         File[] files = dir.listFiles();
@@ -858,13 +789,10 @@ public class Zips {
      * Repacks a provided ZIP file into a new ZIP with a given compression
      * level.
      * <p>
-     * 
-     * @param srcZip
-     *            source ZIP file.
-     * @param dstZip
-     *            destination ZIP file.
-     * @param compressionLevel
-     *            compression level.
+     *
+     * @param srcZip           source ZIP file.
+     * @param dstZip           destination ZIP file.
+     * @param compressionLevel compression level.
      */
     public void repack(File srcZip, File dstZip, int compressionLevel) {
 
@@ -882,11 +810,9 @@ public class Zips {
     /**
      * Repacks a provided ZIP file and replaces old file with the new one.
      * <p>
-     * 
-     * @param zip
-     *            source ZIP file to be repacked and replaced.
-     * @param compressionLevel
-     *            compression level.
+     *
+     * @param zip              source ZIP file to be repacked and replaced.
+     * @param compressionLevel compression level.
      */
     public void repack(File zip, int compressionLevel) {
         try {
@@ -908,7 +834,7 @@ public class Zips {
 
     /**
      * RepackZipEntryCallback used in repacking methods.
-     * 
+     *
      * @author Pavel Grigorenko
      */
     private class RepackZipEntryCallback implements ZipEntryCallback {
@@ -943,10 +869,8 @@ public class Zips {
      * A ZIP file will be first created with a temporary name. After the
      * compressing the directory will be deleted and the ZIP file will be
      * renamed as the original directory.
-     * 
-     * @param dir
-     *            input directory as well as the target ZIP file.
-     * 
+     *
+     * @param dir input directory as well as the target ZIP file.
      * @see #pack(File, File)
      */
     public void unexplode(File dir) {
@@ -959,12 +883,9 @@ public class Zips {
      * A ZIP file will be first created with a temporary name. After the
      * compressing the directory will be deleted and the ZIP file will be
      * renamed as the original directory.
-     * 
-     * @param dir
-     *            input directory as well as the target ZIP file.
-     * @param compressionLevel
-     *            compression level
-     * 
+     *
+     * @param dir              input directory as well as the target ZIP file.
+     * @param compressionLevel compression level
      * @see #pack(File, File)
      */
     public void unexplode(File dir, int compressionLevel) {
@@ -987,11 +908,9 @@ public class Zips {
 
     /**
      * Compresses the given entries into a new ZIP file.
-     * 
-     * @param entries
-     *            ZIP entries added.
-     * @param zip
-     *            new ZIP file created.
+     *
+     * @param entries ZIP entries added.
+     * @param zip     new ZIP file created.
      */
     public void pack(ZipEntrySource[] entries, File zip) {
         log.debug("Creating '{}' from {}.", zip, Arrays.asList(entries));
@@ -1011,15 +930,11 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and appends it with one new entry.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param path
-     *            new ZIP entry path.
-     * @param file
-     *            new entry to be added.
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param path    new ZIP entry path.
+     * @param file    new entry to be added.
+     * @param destZip new ZIP file created.
      */
     public void addEntry(File zip, String path, File file, File destZip) {
         addEntry(zip, new FileSource(path, file), destZip);
@@ -1027,13 +942,10 @@ public class Zips {
 
     /**
      * Changes a zip file, adds one new entry in-place.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param path
-     *            new ZIP entry path.
-     * @param file
-     *            new entry to be added.
+     *
+     * @param zip  an existing ZIP file (only read).
+     * @param path new ZIP entry path.
+     * @param file new entry to be added.
      */
     public void addEntry(final File zip, final String path, final File file) {
         operateInPlace(zip, new BaseInPlaceAction() {
@@ -1047,15 +959,11 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and appends it with one new entry.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param path
-     *            new ZIP entry path.
-     * @param bytes
-     *            new entry bytes (or <code>null</code> if directory).
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param path    new ZIP entry path.
+     * @param bytes   new entry bytes (or <code>null</code> if directory).
+     * @param destZip new ZIP file created.
      */
     public void addEntry(File zip, String path, byte[] bytes, File destZip) {
         addEntry(zip, new ByteSource(path, bytes), destZip);
@@ -1063,13 +971,10 @@ public class Zips {
 
     /**
      * Changes a zip file, adds one new entry in-place.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param path
-     *            new ZIP entry path.
-     * @param bytes
-     *            new entry bytes (or <code>null</code> if directory).
+     *
+     * @param zip   an existing ZIP file (only read).
+     * @param path  new ZIP entry path.
+     * @param bytes new entry bytes (or <code>null</code> if directory).
      */
     public void addEntry(final File zip, final String path, final byte[] bytes) {
         operateInPlace(zip, new BaseInPlaceAction() {
@@ -1083,25 +988,20 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and appends it with one new entry.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entry
-     *            new ZIP entry appended.
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param entry   new ZIP entry appended.
+     * @param destZip new ZIP file created.
      */
     public void addEntry(File zip, ZipEntrySource entry, File destZip) {
-        addEntries(zip, new ZipEntrySource[] { entry }, destZip);
+        addEntries(zip, new ZipEntrySource[]{entry}, destZip);
     }
 
     /**
      * Changes a zip file, adds one new entry in-place.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entry
-     *            new ZIP entry appended.
+     *
+     * @param zip   an existing ZIP file (only read).
+     * @param entry new ZIP entry appended.
      */
     public void addEntry(final File zip, final ZipEntrySource entry) {
         operateInPlace(zip, new BaseInPlaceAction() {
@@ -1115,13 +1015,10 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and appends it with new entries.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entries
-     *            new ZIP entries appended.
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param entries new ZIP entries appended.
+     * @param destZip new ZIP file created.
      */
     public void addEntries(File zip, ZipEntrySource[] entries, File destZip) {
         if (log.isDebugEnabled()) {
@@ -1144,11 +1041,9 @@ public class Zips {
 
     /**
      * Changes a zip file it with with new entries. in-place.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entries
-     *            new ZIP entries appended.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param entries new ZIP entries appended.
      */
     public void addEntries(final File zip, final ZipEntrySource[] entries) {
         operateInPlace(zip, new BaseInPlaceAction() {
@@ -1162,26 +1057,21 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and removes entry with a given path.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read)
-     * @param path
-     *            path of the entry to remove
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read)
+     * @param path    path of the entry to remove
+     * @param destZip new ZIP file created.
      * @since 1.7
      */
     public void removeEntry(File zip, String path, File destZip) {
-        removeEntries(zip, new String[] { path }, destZip);
+        removeEntries(zip, new String[]{path}, destZip);
     }
 
     /**
      * Changes an existing ZIP file: removes entry with a given path.
-     * 
-     * @param zip
-     *            an existing ZIP file
-     * @param path
-     *            path of the entry to remove
+     *
+     * @param zip  an existing ZIP file
+     * @param path path of the entry to remove
      * @since 1.7
      */
     public void removeEntry(final File zip, final String path) {
@@ -1196,13 +1086,10 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and removes entries with given paths.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read)
-     * @param paths
-     *            paths of the entries to remove
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read)
+     * @param paths   paths of the entries to remove
+     * @param destZip new ZIP file created.
      * @since 1.7
      */
     public void removeEntries(File zip, String[] paths, File destZip) {
@@ -1223,11 +1110,9 @@ public class Zips {
 
     /**
      * Changes an existing ZIP file: removes entries with given paths.
-     * 
-     * @param zip
-     *            an existing ZIP file
-     * @param paths
-     *            paths of the entries to remove
+     *
+     * @param zip   an existing ZIP file
+     * @param paths paths of the entries to remove
      * @since 1.7
      */
     public void removeEntries(final File zip, final String[] paths) {
@@ -1242,11 +1127,9 @@ public class Zips {
 
     /**
      * Copies all entries from one ZIP file to another.
-     * 
-     * @param zip
-     *            source ZIP file.
-     * @param out
-     *            target ZIP stream.
+     *
+     * @param zip source ZIP file.
+     * @param out target ZIP stream.
      */
     private void copyEntries(File zip, final ZipOutputStream out) {
         // this one doesn't call copyEntries with ignoredEntries, because that
@@ -1268,13 +1151,10 @@ public class Zips {
     /**
      * Copies all entries from one ZIP file to another, ignoring entries with
      * path in ignoredEntries
-     * 
-     * @param zip
-     *            source ZIP file.
-     * @param out
-     *            target ZIP stream.
-     * @param ignoredEntries
-     *            paths of entries not to copy
+     *
+     * @param zip            source ZIP file.
+     * @param out            target ZIP stream.
+     * @param ignoredEntries paths of entries not to copy
      */
     private void copyEntries(File zip, final ZipOutputStream out, final Set ignoredEntries) {
         final Set names = new HashSet();
@@ -1305,13 +1185,9 @@ public class Zips {
     }
 
     /**
-     * 
-     * @param zip
-     *            zip file to traverse
-     * @param names
-     *            names of entries to filter dirs from
+     * @param zip   zip file to traverse
+     * @param names names of entries to filter dirs from
      * @return Set<String> names of entries that are dirs.
-     * 
      */
     Set filterDirEntries(File zip, Collection names) {
         Set dirs = new HashSet();
@@ -1343,15 +1219,11 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and replaces a given entry in it.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param path
-     *            new ZIP entry path.
-     * @param file
-     *            new entry.
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param path    new ZIP entry path.
+     * @param file    new entry.
+     * @param destZip new ZIP file created.
      * @return <code>true</code> if the entry was replaced.
      */
     public boolean replaceEntry(File zip, String path, File file, File destZip) {
@@ -1360,13 +1232,10 @@ public class Zips {
 
     /**
      * Changes an existing ZIP file: replaces a given entry in it.
-     * 
-     * @param zip
-     *            an existing ZIP file.
-     * @param path
-     *            new ZIP entry path.
-     * @param file
-     *            new entry.
+     *
+     * @param zip  an existing ZIP file.
+     * @param path new ZIP entry path.
+     * @param file new entry.
      * @return <code>true</code> if the entry was replaced.
      */
     public boolean replaceEntry(final File zip, final String path, final File file) {
@@ -1380,15 +1249,11 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and replaces a given entry in it.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param path
-     *            new ZIP entry path.
-     * @param bytes
-     *            new entry bytes (or <code>null</code> if directory).
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param path    new ZIP entry path.
+     * @param bytes   new entry bytes (or <code>null</code> if directory).
+     * @param destZip new ZIP file created.
      * @return <code>true</code> if the entry was replaced.
      */
     public boolean replaceEntry(File zip, String path, byte[] bytes, File destZip) {
@@ -1397,13 +1262,10 @@ public class Zips {
 
     /**
      * Changes an existing ZIP file: replaces a given entry in it.
-     * 
-     * @param zip
-     *            an existing ZIP file.
-     * @param path
-     *            new ZIP entry path.
-     * @param bytes
-     *            new entry bytes (or <code>null</code> if directory).
+     *
+     * @param zip   an existing ZIP file.
+     * @param path  new ZIP entry path.
+     * @param bytes new entry bytes (or <code>null</code> if directory).
      * @return <code>true</code> if the entry was replaced.
      */
     public boolean replaceEntry(final File zip, final String path, final byte[] bytes) {
@@ -1417,26 +1279,21 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and replaces a given entry in it.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entry
-     *            new ZIP entry.
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param entry   new ZIP entry.
+     * @param destZip new ZIP file created.
      * @return <code>true</code> if the entry was replaced.
      */
     public boolean replaceEntry(File zip, ZipEntrySource entry, File destZip) {
-        return replaceEntries(zip, new ZipEntrySource[] { entry }, destZip);
+        return replaceEntries(zip, new ZipEntrySource[]{entry}, destZip);
     }
 
     /**
      * Changes an existing ZIP file: replaces a given entry in it.
-     * 
-     * @param zip
-     *            an existing ZIP file.
-     * @param entry
-     *            new ZIP entry.
+     *
+     * @param zip   an existing ZIP file.
+     * @param entry new ZIP entry.
      * @return <code>true</code> if the entry was replaced.
      */
     public boolean replaceEntry(final File zip, final ZipEntrySource entry) {
@@ -1450,13 +1307,10 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and replaces the given entries in it.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entries
-     *            new ZIP entries to be replaced with.
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param entries new ZIP entries to be replaced with.
+     * @param destZip new ZIP file created.
      * @return <code>true</code> if at least one entry was replaced.
      */
     public boolean replaceEntries(File zip, ZipEntrySource[] entries, File destZip) {
@@ -1496,11 +1350,9 @@ public class Zips {
 
     /**
      * Changes an existing ZIP file: replaces a given entry in it.
-     * 
-     * @param zip
-     *            an existing ZIP file.
-     * @param entries
-     *            new ZIP entries to be replaced with.
+     *
+     * @param zip     an existing ZIP file.
+     * @param entries new ZIP entries to be replaced with.
      * @return <code>true</code> if at least one entry was replaced.
      */
     public boolean replaceEntries(final File zip, final ZipEntrySource[] entries) {
@@ -1514,13 +1366,10 @@ public class Zips {
 
     /**
      * Copies an existing ZIP file and adds/replaces the given entries in it.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entries
-     *            ZIP entries to be replaced or added.
-     * @param destZip
-     *            new ZIP file created.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param entries ZIP entries to be replaced or added.
+     * @param destZip new ZIP file created.
      */
     public void addOrReplaceEntries(File zip, ZipEntrySource[] entries, File destZip) {
         if (log.isDebugEnabled()) {
@@ -1550,7 +1399,7 @@ public class Zips {
                 });
 
                 // Add new entries
-                for (Iterator it = entryByPath.values().iterator(); it.hasNext();) {
+                for (Iterator it = entryByPath.values().iterator(); it.hasNext(); ) {
                     addEntry((ZipEntrySource) it.next(), out);
                 }
             } finally {
@@ -1563,11 +1412,9 @@ public class Zips {
 
     /**
      * Changes a ZIP file: adds/replaces the given entries in it.
-     * 
-     * @param zip
-     *            an existing ZIP file (only read).
-     * @param entries
-     *            ZIP entries to be replaced or added.
+     *
+     * @param zip     an existing ZIP file (only read).
+     * @param entries ZIP entries to be replaced or added.
      */
     public void addOrReplaceEntries(final File zip, final ZipEntrySource[] entries) {
         operateInPlace(zip, new BaseInPlaceAction() {
@@ -1606,11 +1453,9 @@ public class Zips {
 
     /**
      * Adds a given ZIP entry to a ZIP file.
-     * 
-     * @param entry
-     *            new ZIP entry.
-     * @param out
-     *            target ZIP stream.
+     *
+     * @param entry new ZIP entry.
+     * @param out   target ZIP stream.
      */
     void addEntry(ZipEntrySource entry, ZipOutputStream out) throws IOException {
         out.putNextEntry(entry.getEntry());
@@ -1627,13 +1472,10 @@ public class Zips {
 
     /**
      * Adds a given ZIP entry to a ZIP file.
-     * 
-     * @param zipEntry
-     *            new ZIP entry.
-     * @param in
-     *            contents of the ZIP entry.
-     * @param out
-     *            target ZIP stream.
+     *
+     * @param zipEntry new ZIP entry.
+     * @param in       contents of the ZIP entry.
+     * @param out      target ZIP stream.
      */
     void addEntry(ZipEntry zipEntry, InputStream in, ZipOutputStream out) throws IOException {
         out.putNextEntry(zipEntry);
@@ -1645,13 +1487,10 @@ public class Zips {
 
     /**
      * Copies a given ZIP entry to a ZIP file.
-     * 
-     * @param zipEntry
-     *            a ZIP entry from existing ZIP file.
-     * @param in
-     *            contents of the ZIP entry.
-     * @param out
-     *            target ZIP stream.
+     *
+     * @param zipEntry a ZIP entry from existing ZIP file.
+     * @param in       contents of the ZIP entry.
+     * @param out      target ZIP stream.
      */
     void copyEntry(ZipEntry zipEntry, InputStream in, ZipOutputStream out) throws IOException {
         ZipEntry copy = new ZipEntry(zipEntry.getName());
@@ -1663,15 +1502,12 @@ public class Zips {
 
     /**
      * Compares same entry in two ZIP files (byte-by-byte).
-     * 
-     * @param f1
-     *            first ZIP file.
-     * @param f2
-     *            second ZIP file.
-     * @param path
-     *            name of the entry.
+     *
+     * @param f1   first ZIP file.
+     * @param f2   second ZIP file.
+     * @param path name of the entry.
      * @return <code>true</code> if the contents of the entry was same in both
-     *         ZIP files.
+     * ZIP files.
      */
     public boolean entryEquals(File f1, File f2, String path) {
         return entryEquals(f1, f2, path, path);
@@ -1679,15 +1515,11 @@ public class Zips {
 
     /**
      * Compares two ZIP entries (byte-by-byte). .
-     * 
-     * @param f1
-     *            first ZIP file.
-     * @param f2
-     *            second ZIP file.
-     * @param path1
-     *            name of the first entry.
-     * @param path2
-     *            name of the second entry.
+     *
+     * @param f1    first ZIP file.
+     * @param f2    second ZIP file.
+     * @param path1 name of the first entry.
+     * @param path2 name of the second entry.
      * @return <code>true</code> if the contents of the entries were same.
      */
     public boolean entryEquals(File f1, File f2, String path1, String path2) {
@@ -1709,15 +1541,11 @@ public class Zips {
 
     /**
      * Compares two ZIP entries (byte-by-byte). .
-     * 
-     * @param zf1
-     *            first ZIP file.
-     * @param zf2
-     *            second ZIP file.
-     * @param path1
-     *            name of the first entry.
-     * @param path2
-     *            name of the second entry.
+     *
+     * @param zf1   first ZIP file.
+     * @param zf2   second ZIP file.
+     * @param path1 name of the first entry.
+     * @param path2 name of the second entry.
      * @return <code>true</code> if the contents of the entries were same.
      */
     public boolean entryEquals(ZipFile zf1, ZipFile zf2, String path1, String path2) {
@@ -1730,15 +1558,11 @@ public class Zips {
 
     /**
      * Compares two ZIP entries (byte-by-byte). .
-     * 
-     * @param zf1
-     *            first ZIP file.
-     * @param zf2
-     *            second ZIP file.
-     * @param path1
-     *            name of the first entry.
-     * @param path2
-     *            name of the second entry.
+     *
+     * @param zf1   first ZIP file.
+     * @param zf2   second ZIP file.
+     * @param path1 name of the first entry.
+     * @param path2 name of the second entry.
      * @return <code>true</code> if the contents of the entries were same.
      */
     private boolean doEntryEquals(ZipFile zf1, ZipFile zf2, String path1, String path2) throws IOException {
@@ -1774,9 +1598,8 @@ public class Zips {
 
     /**
      * Closes the ZIP file while ignoring any errors.
-     * 
-     * @param zf
-     *            ZIP file to be closed.
+     *
+     * @param zf ZIP file to be closed.
      */
     public void closeQuietly(ZipFile zf) {
         try {
@@ -1796,13 +1619,14 @@ public class Zips {
 
     /**
      * Simple helper to make inplace operation easier
-     * 
+     *
      * @author shelajev
      */
     private abstract class BaseInPlaceAction {
 
         /**
          * act
+         *
          * @param tmpFile 文件
          * @return true if something has been changed during the action.
          */
@@ -1810,16 +1634,12 @@ public class Zips {
     }
 
     /**
-     * 
      * This method provides a general infrastructure for in-place operations. It
      * creates temp file as a destination, then invokes the action on source and
      * destination. Then it copies the result back into src file.
-     * 
-     * @param src
-     *            - source zip file we want to modify
-     * @param action
-     *            - action which actually modifies the archives
-     * 
+     *
+     * @param src    - source zip file we want to modify
+     * @param action - action which actually modifies the archives
      * @return result of the action
      */
     private boolean operateInPlace(File src, BaseInPlaceAction action) {
@@ -1827,10 +1647,11 @@ public class Zips {
         try {
             tmp = File.createTempFile("zt-zip-tmp", ".zip");
             boolean result = action.act(tmp);
-            if (result) { // else nothing changes
+            if (result) {
                 FileUtils.forceDelete(src);
                 FileUtils.moveFile(tmp, src);
             }
+            // else nothing changes
             return result;
         } catch (IOException e) {
             throw rethrow(e);
@@ -1859,11 +1680,9 @@ public class Zips {
 
         /**
          * Copies the given file into an output stream.
-         * 
-         * @param file
-         *            input file (must exist).
-         * @param out
-         *            output stream.
+         *
+         * @param file input file (must exist).
+         * @param out  output stream.
          */
         public static void copy(File file, OutputStream out) throws IOException {
             FileInputStream in = new FileInputStream(file);
@@ -1878,11 +1697,9 @@ public class Zips {
          * Copies the given input stream into a file.
          * <p>
          * The target file must not be a directory and its parent must exist.
-         * 
-         * @param in
-         *            source stream.
-         * @param file
-         *            output file to be created or overwritten.
+         *
+         * @param in   source stream.
+         * @param file output file to be created or overwritten.
          */
         public static void copy(InputStream in, File file) throws IOException {
             OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
@@ -1896,12 +1713,11 @@ public class Zips {
         /**
          * Find a non-existing file in the same directory using the same name as
          * prefix.
-         * 
-         * @param file
-         *            file used for the name and location (it is not read or
-         *            written).
+         *
+         * @param file file used for the name and location (it is not read or
+         *             written).
          * @return a non-existing file in the same directory using the same name
-         *         as prefix.
+         * as prefix.
          */
         public static File getTempFileFor(File file) {
             File parent = file.getParentFile();
@@ -1920,12 +1736,10 @@ public class Zips {
 
         /**
          * Invoked for each entry in a ZIP file.
-         * 
-         * @param in
-         *            contents of the ZIP entry.
-         * @param zipEntry
-         *            ZIP entry.
-         * @throws  IOException io错误
+         *
+         * @param in       contents of the ZIP entry.
+         * @param zipEntry ZIP entry.
+         * @throws IOException io错误
          */
         void process(InputStream in, ZipEntry zipEntry) throws IOException;
 
@@ -1934,7 +1748,7 @@ public class Zips {
     /**
      * Call-back for filtering and renaming ZIP entries while packing or
      * unpacking.
-     * 
+     *
      * @author Rein Raudjärv
      */
     public interface NameMapper {
@@ -1942,11 +1756,10 @@ public class Zips {
         /**
          * map
          *
-         * @param name
-         *            original name.
+         * @param name original name.
          * @return name to be stored in the ZIP file or the destination
-         *         directory, <code>null</code> means that the entry will be
-         *         skipped.
+         * directory, <code>null</code> means that the entry will be
+         * skipped.
          */
         String map(String name);
 
@@ -1954,9 +1767,8 @@ public class Zips {
 
     /**
      * NOP implementation of the name mapper.
-     * 
+     *
      * @author Rein Raudjärv
-     * 
      * @see NameMapper
      */
     static final class IdentityNameMapper implements NameMapper {
@@ -1975,28 +1787,31 @@ public class Zips {
 
     /**
      * ZIP entry with its contents.
-     * 
+     *
      * @author Rein Raudjärv
      */
     public interface ZipEntrySource {
 
         /**
          * getPath
+         *
          * @return path of the given entry (not <code>null</code>).
          */
         String getPath();
 
         /**
          * getEntry
+         *
          * @return meta-data of the given entry (not <code>null</code>).
          */
         ZipEntry getEntry();
 
         /**
          * getInputStream
+         *
          * @return an input stream of the given entry or <code>null</code> if
-         *         this entry is a directory.
-         * @throws  IOException  io错误
+         * this entry is a directory.
+         * @throws IOException io错误
          */
         InputStream getInputStream() throws IOException;
 
@@ -2108,19 +1923,17 @@ public class Zips {
 
     /**
      * Call-back for traversing ZIP entries without their contents.
-     * 
+     *
      * @author Rein Raudjärv
-     * 
      * @see ZipEntryCallback
      */
     public interface ZipInfoCallback {
 
         /**
          * Invoked for each entry in a ZIP file.
-         * 
-         * @param zipEntry
-         *            ZIP entry.
-         * @throws  IOException io错误
+         *
+         * @param zipEntry ZIP entry.
+         * @throws IOException io错误
          */
         void process(ZipEntry zipEntry) throws IOException;
 

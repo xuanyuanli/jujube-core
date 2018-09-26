@@ -1,26 +1,20 @@
 package org.jujubeframework.util;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.StringTokenizer;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.jujubeframework.util.support.PatternHolder;
+import com.google.common.collect.Maps;
+import net.sourceforge.pinyin4j.PinyinHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jujubeframework.util.support.PatternHolder;
 
-import com.google.common.collect.Maps;
-
-import net.sourceforge.pinyin4j.PinyinHelper;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 文本字符相关工具类
@@ -118,7 +112,8 @@ public class Texts {
                 continue;
             }
 
-            b += 256; // 去掉符号位
+            // 去掉符号位
+            b += 256;
 
             if (((b >> 5) ^ 0x6) == 0) {
                 buffer.put(bytes, i, 2);
@@ -176,7 +171,8 @@ public class Texts {
         if (StringUtils.isBlank(text)) {
             return "";
         }
-        return text.replace(" ", " "); // utf-8空格替换;
+        // utf-8空格替换;
+        return text.replace(" ", " ");
     }
 
     /**
@@ -192,8 +188,10 @@ public class Texts {
      * 获取一段html的纯文本
      */
     public static String getHtmlText(String html) {
-        String txtcontent = html.replaceAll("</?[^>]+>", ""); // 剔出<html>的标签
-        txtcontent = txtcontent.replaceAll("<a>\\s*|\t|\r|\n</a>", "");// 去除字符串中的空格,回车,换行符,制表符
+        // 剔出<html>的标签
+        String txtcontent = html.replaceAll("</?[^>]+>", "");
+        // 去除字符串中的空格,回车,换行符,制表符
+        txtcontent = txtcontent.replaceAll("<a>\\s*|\t|\r|\n</a>", "");
         return txtcontent;
     }
 
@@ -348,21 +346,29 @@ public class Texts {
      */
     public static String highlight(String source, String keyWord, String styleBefore, String styleAfter) {
         int begin = 0;
-        int len = styleAfter.length() + styleBefore.length() + keyWord.length(); // 加上样式之后的关键字长度
+        // 加上样式之后的关键字长度
+        int len = styleAfter.length() + styleBefore.length() + keyWord.length();
         StringBuilder sb = new StringBuilder(source.length() + len * 5);
         String tag = source;
         while (true) {
-            begin = tag.toUpperCase().indexOf(keyWord.toUpperCase()); // 不区分大小写，找到关键字
+            // 不区分大小写，找到关键字
+            begin = tag.toUpperCase().indexOf(keyWord.toUpperCase());
             // 如果找到关键字，则关键字替换为高亮样式
             if (begin != -1) {
                 int end = begin + keyWord.length();
-                String red = tag.substring(begin, end);// 原文本中的关键字（保持其大小写状态）
-                String result = tag.substring(0, end); // 此次查找的字符串
-                result = result.replace(red, (styleBefore + red + styleAfter)); // 对文本中关键字进行高亮替换
-                sb.append(result); // 保存已经替换完成的那一段
-                tag = tag.substring(end); // 截取字符串，在后面继续寻找关键字，进行高亮替换
+                // 原文本中的关键字（保持其大小写状态）
+                String red = tag.substring(begin, end);
+                // 此次查找的字符串
+                String result = tag.substring(0, end);
+                // 对文本中关键字进行高亮替换
+                result = result.replace(red, (styleBefore + red + styleAfter));
+                // 保存已经替换完成的那一段
+                sb.append(result);
+                // 截取字符串，在后面继续寻找关键字，进行高亮替换
+                tag = tag.substring(end);
             } else {
-                sb.append(tag); // 如果没有找到关键字，把文本遗落的一段放入结果中
+                // 如果没有找到关键字，把文本遗落的一段放入结果中
+                sb.append(tag);
                 break;
             }
         }
@@ -587,7 +593,8 @@ public class Texts {
             String curGroupName = groupFunction.apply(line);
             if (StringUtils.isNotBlank(curGroupName)) {
                 group.put(groupName, part);
-                groupName = curGroupName; // 因为group中元素都在group下面，so...
+                // 因为group中元素都在group下面，so...
+                groupName = curGroupName;
                 part = new ArrayList<>();
             } else if (StringUtils.isNotBlank(line)) {
                 part.add(line);
