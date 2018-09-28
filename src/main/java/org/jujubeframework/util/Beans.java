@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.asm.*;
+import org.springframework.asm.Type;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -21,10 +22,9 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.*;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,6 +189,20 @@ public class Beans {
         try {
             return method.invoke(obj, args);
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 反射调用接口中的default方法
+     */
+    public static Object invokeInterfaceDefault(Method method, Object... args) {
+        try {
+            //必须经过Java接口反射来做
+            Class<?>[] classes={method.getDeclaringClass()};
+            Object object = Proxy.newProxyInstance(method.getDeclaringClass().getClassLoader(), classes, new InterfaceDefaultHandler());
+            return invoke(method,object);
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
@@ -466,7 +480,7 @@ public class Beans {
     }
 
     /**
-     * 通过反射, 获得Class定义中声明的父类的泛型参数的类型. 如无法找到, 返回Object.class.
+     * 通过反射, 获得Class定义中声明的父类(或接口,如果是接口的话，默认获得第一个泛型接口)的泛型参数的类型. 如无法找到, 返回Object.class.
      *
      * @param clazz clazz The class to introspect
      * @param index the Index of the generic ddeclaration,start from 0.
@@ -475,6 +489,10 @@ public class Beans {
      */
     public static Class<?> getClassGenericType(final Class<?> clazz, final int index) {
         java.lang.reflect.Type genType = clazz.getGenericSuperclass();
+        java.lang.reflect.Type[] genericInterfaces = clazz.getGenericInterfaces();
+        if (genType==null && genericInterfaces !=null && genericInterfaces.length>0){
+            genType = genericInterfaces[0];
+        }
 
         if (!(genType instanceof ParameterizedType)) {
             logger.warn(clazz.getSimpleName() + "'s superclass not ParameterizedType");
@@ -550,4 +568,19 @@ public class Beans {
 
     }
 
+    public static class InterfaceDefaultHandler implements InvocationHandler {
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if (method.isDefault()) {
+                Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+                constructor.setAccessible(true);
+
+                Class<?> declaringClass = method.getDeclaringClass();
+                int allModes = MethodHandles.Lookup.PUBLIC | MethodHandles.Lookup.PRIVATE | MethodHandles.Lookup.PROTECTED | MethodHandles.Lookup.PACKAGE;
+
+                return constructor.newInstance(declaringClass, allModes).unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
+            }
+            throw new RuntimeException("必须是interface的default方法调用");
+        }
+    }
 }
