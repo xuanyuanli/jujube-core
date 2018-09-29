@@ -126,7 +126,7 @@ public class Pojos {
         boolean bool = (Double.class.equals(sourceFieldClass) || double.class.equals(sourceFieldClass) || Float.class.equals(sourceFieldClass) || float.class.equals(sourceFieldClass)) && String.class.equals(destFieldClass);
         if (bool) {
             Number number = (Number) sourceValue;
-            return Utils.numberToString(number.doubleValue());
+            return Calcs.numberToString(number.doubleValue());
         }
         return sourceValue;
     }

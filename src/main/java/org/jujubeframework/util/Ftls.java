@@ -80,7 +80,7 @@ public class Ftls {
      * @param root         FreeMarker数据模型
      */
     public static void processFileTemplateToFile(String templateName, String outputPath, Map<String, Object> root) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(Utils.createFile(outputPath)), Charsets.UTF_8);) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(Files.createFile(outputPath)), Charsets.UTF_8);) {
             processFileTemplateTo(templateName, root, writer);
         } catch (IOException e) {
             throw new RuntimeException(e);

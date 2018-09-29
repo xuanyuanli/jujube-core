@@ -345,7 +345,7 @@ public class Beans {
             final ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
             try {
-                ClassReader classReader = new ClassReader(Utils.getDefaultClassLoader().getResourceAsStream(className.replace('.', '/') + ".class"));
+                ClassReader classReader = new ClassReader(getDefaultClassLoader().getResourceAsStream(className.replace('.', '/') + ".class"));
                 classReader.accept(new ClassVisitor(Opcodes.ASM4, classWriter) {
                     @Override
                     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
@@ -429,44 +429,6 @@ public class Beans {
         return result;
     }
 
-    static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
-    private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-
-    /**
-     * 获得包下的所有class
-     */
-    public static List<Class<?>> getPackageClasses(String packageName) {
-        List<Class<?>> list = Lists.newArrayList();
-        String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(packageName) + "/" + DEFAULT_RESOURCE_PATTERN;
-        try {
-            Resource[] resources = resourcePatternResolver.getResources(packageSearchPath);
-            for (Resource resource : resources) {
-                if (resource.isReadable()) {
-                    String filePath = URLDecoder.decode(resource.getURL().getFile(), "UTF-8");
-                    String className = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length() - 6);
-                    if (!className.contains("$")) {
-                        try {
-                            Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(getRealPackageName(filePath, packageName) + "." + className);
-                            list.add(clazz);
-                        } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                            continue;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("resourcePatternResolver.getResources", e);
-        }
-        return list;
-    }
-
-    private static String getRealPackageName(String filePath, String packageName) {
-        String pName = packageName.replace(".", "/");
-        String tPath = filePath.substring(filePath.indexOf(pName));
-        pName = tPath.substring(0, tPath.lastIndexOf("/"));
-        return pName.replace("/", ".");
-    }
-
     /**
      * 通过反射, 获得Class定义中声明的泛型参数的类型, 注意泛型必须定义在父类处 如无法找到, 返回Object.class.<br>
      *
@@ -511,6 +473,33 @@ public class Beans {
         }
 
         return (Class<?>) params[index];
+    }
+
+    /**
+     * 获得当前项目（jar）的ClassLoader
+     */
+    public static ClassLoader getDefaultClassLoader() {
+        ClassLoader cl = null;
+        try {
+            cl = Thread.currentThread().getContextClassLoader();
+        } catch (Throwable ex) {
+            // Cannot access thread context ClassLoader - falling back...
+        }
+        if (cl == null) {
+            // No thread context class loader -> use class loader of this class.
+            cl = Beans.class.getClassLoader();
+            if (cl == null) {
+                // getClassLoader() returning null indicates the bootstrap
+                // ClassLoader
+                try {
+                    cl = ClassLoader.getSystemClassLoader();
+                } catch (Throwable ex) {
+                    // Cannot access system ClassLoader - oh well, maybe the
+                    // caller can live with null...
+                }
+            }
+        }
+        return cl;
     }
 
     /**

@@ -31,10 +31,6 @@ public class Dynamics {
         return t;
     }
 
-    public static Map<String, Object> mapOf(Object... keyValue) {
-        return Utils.newHashMap(keyValue);
-    }
-
     @SafeVarargs
     public static <T> Set<T> setOf(T... t) {
         Set<T> set = Sets.newLinkedHashSet();

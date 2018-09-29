@@ -4,13 +4,14 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * 算数工具类(calculate)<br>
  * <p>
- * Math类常用函数：
+ * Math类常用函数
  * <ul>
  * <li>pow:幂运算</li>
  * <li>abs:绝对值</li>
@@ -30,7 +31,7 @@ public class Calcs {
     }
 
     /**
-     * ：确认两个金额值是否相等（非常严谨的比较）
+     * 确认两个金额值是否相等（非常严谨的比较）
      */
     public static boolean equ(String str1, String str2) {
         Validate.notBlank(str1);
@@ -46,21 +47,21 @@ public class Calcs {
     }
 
     /**
-     * ：确认两个金额值是否相等（非常严谨的比较）
+     * 确认两个金额值是否相等（非常严谨的比较）
      */
     public static boolean equ(Number str1, Number str2) {
         return equ(String.valueOf(str1), str2.toString());
     }
 
     /**
-     * ：确认两个金额值是否相等（非常严谨的比较）
+     * 确认两个金额值是否相等（非常严谨的比较）
      */
     public static boolean equ(Number str1, String str2) {
         return equ(String.valueOf(str1), str2);
     }
 
     /**
-     * ：第一个数是否比第二个数小（非常严谨的比较）
+     * 第一个数是否比第二个数小（非常严谨的比较）
      */
     public static boolean isLow(String str1, String str2) {
         Validate.notBlank(str1);
@@ -77,14 +78,14 @@ public class Calcs {
     }
 
     /**
-     * ：第一个数是否比第二个数小（非常严谨的比较）
+     * 第一个数是否比第二个数小（非常严谨的比较）
      */
     public static boolean isLow(Number str1, String str2) {
         return isLow(String.valueOf(str1), str2);
     }
 
     /**
-     * ：加法运算
+     * 加法运算
      *
      * @param str1   被加数
      * @param str2   加数
@@ -113,7 +114,7 @@ public class Calcs {
     }
 
     /**
-     * ：加法运算
+     * 加法运算
      *
      * @param str1 被加数
      * @param str2 加数
@@ -124,7 +125,7 @@ public class Calcs {
     }
 
     /**
-     * ：减法
+     * 减法
      *
      * @param str1   被减数
      * @param str2   减数
@@ -146,7 +147,7 @@ public class Calcs {
     }
 
     /**
-     * ：减法运算
+     * 减法运算
      *
      * @param str1 被减数
      * @param str2 减数
@@ -164,7 +165,7 @@ public class Calcs {
     }
 
     /**
-     * ：乘法运算 指定保留到小数点后位数
+     * 乘法运算 指定保留到小数点后位数
      *
      * @param str1   被乘数
      * @param str2   乘数
@@ -187,7 +188,7 @@ public class Calcs {
     }
 
     /**
-     * ：乘法运算
+     * 乘法运算
      */
     public static String mul(String str1, String str2) {
         return mul(str1, str2, 2);
@@ -201,7 +202,7 @@ public class Calcs {
     }
 
     /**
-     * ：除法运算 指定保留到小数点后位数
+     * 除法运算 指定保留到小数点后位数
      *
      * @param str1   被除数
      * @param str2   除数
@@ -226,7 +227,7 @@ public class Calcs {
     }
 
     /**
-     * ：除法运算 保留到小数点后2位
+     * 除法运算 保留到小数点后2位
      */
     public static String div(String str1, String str2) {
         return div(str1, str2, 2);
@@ -262,5 +263,24 @@ public class Calcs {
             int index = (int) (list.size() / 2) + 1;
             return list.get(index).doubleValue();
         }
+    }
+
+    /**
+     * 数字格式化
+     */
+    public static String numberFormat(Number number, String pattern) {
+        DecimalFormat myformat = new DecimalFormat();
+        myformat.applyPattern(pattern);
+        return myformat.format(number);
+    }
+
+    /**
+     * 把number转换为string，非科学计数法
+     */
+    public static String numberToString(Number value) {
+        // 格式化设置
+        DecimalFormat decimalFormat = new DecimalFormat("###########.##########");
+        decimalFormat.setGroupingUsed(false);
+        return decimalFormat.format(value);
     }
 }

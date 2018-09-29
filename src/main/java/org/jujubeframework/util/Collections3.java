@@ -112,6 +112,19 @@ public class Collections3 {
     }
 
     /**
+     * 对数组进行trim，摒弃数组中的空值
+     */
+    public static String[] trim(String[] params) {
+        List<String> result = new ArrayList<>();
+        for (String string : params) {
+            if (!StringUtils.isBlank(string.trim()) || !"".equals(string)) {
+                result.add(string);
+            }
+        }
+        return result.toArray(new String[0]);
+    }
+
+    /**
      * 提取集合中的对象的两个属性(通过Getter函数), 组合成Map.
      *
      * @param collection        来源集合.

@@ -10,7 +10,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jujubeframework.constant.SystemProperties;
-import org.jujubeframework.util.Utils;
+import org.jujubeframework.util.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class ExcelWriter {
         File destFile = null;
         try {
             // 解决线程同步问题，创建一个不可能冲突的文件夹
-            File tmpDir = new File(SystemProperties.TMPDIR, "/temp_excel/" + Utils.asyncKey() + "/");
+            File tmpDir = new File(SystemProperties.TMPDIR, "/temp_excel/" + Thread.currentThread().getId()+System.currentTimeMillis() + "/");
             if (!tmpDir.exists()) {
                 tmpDir.mkdirs();
             }
@@ -109,7 +109,7 @@ public class ExcelWriter {
         FileOutputStream outputStream = null;
         try {
             if (!destFile.exists()) {
-                destFile = Utils.createFile(destFile.getAbsolutePath());
+                destFile = Files.createFile(destFile.getAbsolutePath());
             }
             outputStream = new FileOutputStream(destFile);
             IOUtils.copy(generateExcelInputStream(lines), outputStream);

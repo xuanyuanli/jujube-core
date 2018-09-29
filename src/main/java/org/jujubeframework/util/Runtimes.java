@@ -31,7 +31,7 @@ public class Runtimes {
 
     private static String getZkPath() {
         if (SystemProperties.WINDOWS && ZK_PATH.length() == 0) {
-            File projectPath = new File(Utils.getProjectPath());
+            File projectPath = new File(Resources.getProjectPath());
             while (true) {
                 String name = projectPath.getName();
                 if ("service".equals(name) || "base".equals(name) || "schedule".equals(name) || "application".equals(name) || name.endsWith("-application")) {

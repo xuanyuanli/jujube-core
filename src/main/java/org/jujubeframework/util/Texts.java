@@ -5,6 +5,7 @@ import net.sourceforge.pinyin4j.PinyinHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jujubeframework.util.support.PatternHolder;
 
 import java.io.UnsupportedEncodingException;
@@ -39,6 +40,23 @@ public class Texts {
             }
         }
         return keyword;
+    }
+
+    /**
+     * 将一个转义后的符号，反转义回来
+     */
+    public static String[] unescape(String[] params, String escape) {
+        String str = StringEscapeUtils.unescapeHtml4(escape);
+        String[] result = new String[params.length];
+        int i = 0;
+        for (String string : params) {
+            if (string.contains(escape)) {
+                string = string.replace(escape, str);
+            }
+            result[i] = string;
+            i++;
+        }
+        return result;
     }
 
     /**
