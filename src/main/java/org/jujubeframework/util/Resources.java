@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 /**
  * @author John Li
@@ -118,10 +119,9 @@ public class Resources {
      * 获得classpath*下的指定资源
      */
     public static Resource[] getClassPathAllResources(String resourceName) {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         Resource[] resources = null;
         try {
-            resources = resolver.getResources("classpath*:" + resourceName);
+            resources = resourcePatternResolver.getResources("classpath*:" + resourceName);
         } catch (IOException e) {
         }
         return resources;
@@ -131,10 +131,9 @@ public class Resources {
      * 获得classpath下的指定资源
      */
     public static Resource getClassPathResources(String resourceName) {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         Resource[] resources = null;
         try {
-            resources = resolver.getResources("classpath:" + resourceName);
+            resources = resourcePatternResolver.getResources("classpath:" + resourceName);
         } catch (IOException e) {
         }
         return resources != null && resources.length > 0 ? resources[0] : null;
@@ -144,8 +143,7 @@ public class Resources {
      * 获得当前的classpath目录
      */
     public static File getCurrentClasspath() {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        Resource resource = resolver.getResource("classpath:./");
+        Resource resource = resourcePatternResolver.getResource("classpath:./");
         try {
             return resource.getFile();
         } catch (IOException e) {

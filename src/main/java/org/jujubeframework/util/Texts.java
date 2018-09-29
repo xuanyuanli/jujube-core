@@ -323,16 +323,7 @@ public class Texts {
      * @return 分割后的数组
      */
     public static String[] stringTokenizer(String srcString, String tokenizerString) {
-        StringTokenizer fenxi = new StringTokenizer(srcString, tokenizerString);
-        int length = fenxi.countTokens();
-        String[] s = new String[length];
-        int i = 0;
-        while (fenxi.hasMoreElements()) {
-            String str = fenxi.nextToken();
-            s[i] = str.trim();
-            i++;
-        }
-        return s;
+        return org.springframework.util.StringUtils.tokenizeToStringArray(srcString,tokenizerString);
     }
 
     /**
@@ -595,8 +586,8 @@ public class Texts {
     public static Map<String, List<String>> group(List<String> lines, Function<String, String> groupFunction) {
         Map<String, List<String>> group = new LinkedHashMap<>();
         List<String> part = new ArrayList<>();
-        String groupName = "";
         // 先找出第一个groupName
+        String groupName = "";
         int i = 0;
         for (; i < lines.size(); i++) {
             String line = lines.get(i);

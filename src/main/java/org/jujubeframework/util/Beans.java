@@ -27,6 +27,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.*;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -479,27 +480,7 @@ public class Beans {
      * 获得当前项目（jar）的ClassLoader
      */
     public static ClassLoader getDefaultClassLoader() {
-        ClassLoader cl = null;
-        try {
-            cl = Thread.currentThread().getContextClassLoader();
-        } catch (Throwable ex) {
-            // Cannot access thread context ClassLoader - falling back...
-        }
-        if (cl == null) {
-            // No thread context class loader -> use class loader of this class.
-            cl = Beans.class.getClassLoader();
-            if (cl == null) {
-                // getClassLoader() returning null indicates the bootstrap
-                // ClassLoader
-                try {
-                    cl = ClassLoader.getSystemClassLoader();
-                } catch (Throwable ex) {
-                    // Cannot access system ClassLoader - oh well, maybe the
-                    // caller can live with null...
-                }
-            }
-        }
-        return cl;
+        return ClassUtils.getDefaultClassLoader();
     }
 
     /**
@@ -512,6 +493,11 @@ public class Beans {
      */
     public static boolean isBasicType(Class<?> cl) {
         return cl.isPrimitive() || BASIC_TYPE.contains(cl);
+    }
+
+    /**从方法实参中获得对应类型的对象*/
+    public static <T> T getObjcetFromMethodArgs(Object[] methodArgs, Class<T> clazz) {
+        return (T) Arrays.asList(methodArgs).stream().filter(o->clazz.isAssignableFrom(o.getClass())).findFirst().orElse(null);
     }
 
     /**
