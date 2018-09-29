@@ -1,4 +1,4 @@
-package org.jujubeframework.support.ram;
+package org.jujubeframework.util;
 
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +13,7 @@ import java.util.Map;
 public class RamUsageEstimatorTest {
 
     @Test
-    public void testSizeOfObject() {
+    public void sizeOfObject() {
         Map<String, Object> map = DataGenerator.fullMap();
         Map<String, Object> map2 = new HashMap<>();
         BeansTest.User user = new BeansTest.User();

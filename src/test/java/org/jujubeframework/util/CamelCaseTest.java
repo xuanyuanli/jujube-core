@@ -1,4 +1,4 @@
-package org.jujubeframework.util.jdbc;
+package org.jujubeframework.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.jujubeframework.util.CamelCase;

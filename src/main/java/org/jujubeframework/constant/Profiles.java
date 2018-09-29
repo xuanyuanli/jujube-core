@@ -27,18 +27,6 @@ public class Profiles {
         return System.getProperty(SPRING_PROFILES_ACTIVE);
     }
 
-    /**
-     * 是否是测试环境
-     */
-    public static boolean isTestProfile() {
-        try {
-            Beans.forName(H2_DRIVER_CLASS_NAME);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     public static final String ACTIVE_PROFILE = SPRING_PROFILES_ACTIVE;
     public static final String DEFAULT_PROFILE = "spring.profiles.default";
     public static final String PRODUCTION = "prod";

@@ -38,7 +38,7 @@ public class BeansTest {
     }
 
     @Test
-    public final void testBeanToMap() {
+    public final void beanToMap() {
         ChildUser user = (ChildUser) new ChildUser().setName("abc").setAge(12);
         Map<String, Object> map = Beans.beanToMap(user);
         assertThat(map).hasSize(8);
@@ -47,12 +47,12 @@ public class BeansTest {
     }
 
     @Test
-    public final void testGetInstance() {
+    public final void getInstance() {
         assertThat(Beans.getInstance(User.class)).isNotNull();
     }
 
     @Test
-    public final void testGetPropertyDescriptor() {
+    public final void getPropertyDescriptor() {
         PropertyDescriptor propertyDescriptor = Beans.getPropertyDescriptor(ChildUser.class, "name");
         assertThat(propertyDescriptor.getWriteMethod()).isNotNull();
         assertThat(propertyDescriptor.getPropertyType()).isEqualTo(String.class);
@@ -65,7 +65,7 @@ public class BeansTest {
     }
 
     @Test
-    public final void testGetAllDeclaredFields() {
+    public final void getAllDeclaredFields() {
         List<String> names = Beans.getAllDeclaredFieldNames(ChildUser.class);
         assertThat(names).hasSize(8).contains("age", "blogType", "cardId", "id", "log_type", "name", "price", "APass");
     }

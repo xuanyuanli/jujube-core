@@ -6,8 +6,17 @@ package org.jujubeframework.util.office;
  * @author John Li Email：jujubeframework@163.com
  */
 public class ExcelReaderConfig {
+    /**
+     * 是否替换单元格中的换行符和制表符
+     */
     private boolean replaceCellLineBreak;
+    /**
+     * 设置 是否替换单元格中的换行符和制表符。默认为false
+     */
     private boolean trimCellContent;
+    /**
+     * 是否trim单元格内容
+     */
     private boolean blankLineTerminated;
 
     public static final ExcelReaderConfig DEFAULT = new ExcelReaderConfig(true, true, false);
@@ -27,23 +36,14 @@ public class ExcelReaderConfig {
         this.blankLineTerminated = blankLineTerminated;
     }
 
-    /**
-     * 是否替换单元格中的换行符和制表符
-     */
     public boolean isReplaceCellLineBreak() {
         return replaceCellLineBreak;
     }
 
-    /**
-     * 设置 是否替换单元格中的换行符和制表符。默认为false
-     */
     public void setReplaceCellLineBreak(boolean replaceCellLineBreak) {
         this.replaceCellLineBreak = replaceCellLineBreak;
     }
 
-    /**
-     * 是否trim单元格内容
-     */
     public boolean isTrimCellContent() {
         return trimCellContent;
     }

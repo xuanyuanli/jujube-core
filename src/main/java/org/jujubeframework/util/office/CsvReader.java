@@ -34,6 +34,12 @@ public class CsvReader implements Iterable<List<String>> {
     private List<CSVRecord> csvRecords;
     public static final Charset DEFAULT_CHARSET = Charsets.GBK;
 
+    /**
+     * 构造
+     * @param file  csv文件
+     * @param charset  文件编码
+     * @param config  文件读取的一些配置规则
+     */
     public CsvReader(File file, Charset charset, ExcelReaderConfig config) {
         Validate.notNull(config);
         Validate.isTrue(file.exists(), "file not exists");

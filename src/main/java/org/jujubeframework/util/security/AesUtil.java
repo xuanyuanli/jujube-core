@@ -59,7 +59,7 @@ public class AesUtil {
         }
     }
 
-    public static byte[] fullZore(String data, int blockSize) {
+    private static byte[] fullZore(String data, int blockSize) {
         byte[] dataBytes = data.getBytes();
         int plaintextLength = dataBytes.length;
         if (plaintextLength % blockSize != 0) {
