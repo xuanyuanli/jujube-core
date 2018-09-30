@@ -196,6 +196,9 @@ public class Beans {
 
     /**
      * 反射调用接口中的default方法
+     * @param method 方法
+     * @param args 方法参数
+     * @return 如果
      */
     public static Object invokeInterfaceDefault(Method method, Object... args) {
         try {
@@ -204,6 +207,7 @@ public class Beans {
             Object object = Proxy.newProxyInstance(method.getDeclaringClass().getClassLoader(), classes, new InterfaceDefaultHandler());
             return invoke(method,object);
         } catch (Throwable e) {
+//            return  null;
             throw new RuntimeException(e);
         }
     }

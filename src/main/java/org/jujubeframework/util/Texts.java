@@ -793,9 +793,11 @@ public class Texts {
      * 类中三个字段参考Matcher类
      */
     public static class RegexQueryInfo {
+        /**整个正则匹配到的字符*/
         private String group;
         private int start;
         private int end;
+        /**正则中每个括号匹配到的字符集合，从0开始。例如用(a)(b)去匹配'ab'，groups的size=2*/
         private List<String> groups;
 
         public String getGroup() {
