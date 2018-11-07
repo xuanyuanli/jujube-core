@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.jujube-framework</groupId>
     <artifactId>jujube-core</artifactId>
-    <version>1.0.1</version>
+    <version>1.1</version>
     <description>核心模块</description>
     <packaging>jar</packaging>
 
