@@ -29,3 +29,14 @@
 在线api：https://jujube-framework.github.io/jujube-core/docs/api/index.html
 
 
+
+# 使用
+
+```
+        <dependency>
+            <groupId>io.github.jujube-framework</groupId>
+            <artifactId>jujube-core</artifactId>
+            <version>1.1</version>
+        </dependency>
+```
+
