@@ -167,7 +167,7 @@ public class ExcelReader implements Iterable<List<String>> {
         String cellContent = "";
         if (cell != null) {
             // 如果有表格中单元格有公式，cell.toString()得不到正确结果。这里需要做下处理。需要注意：公式计算出来的数字大多为浮点型，需要客户端去精确
-            if (cell.getCellTypeEnum() == CellType.FORMULA) {
+            if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
                 try {
                     CellValue cellValue = evaluator.evaluate(cell);
                     cellContent = cellValue.formatAsString();

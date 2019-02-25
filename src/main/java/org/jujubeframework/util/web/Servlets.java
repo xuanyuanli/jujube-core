@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.WebUtils;
 
@@ -415,5 +416,18 @@ public class Servlets {
             return accept.contains(MediaType.TEXT_HTML) || accept.contains(MediaType.APPLICATION_XHTML_XML);
         }
         return false;
+    }
+
+    /** 获得资源国际化的当前Locale对象 */
+    public static Locale getCurrentLocale() {
+        HttpServletRequest request = getCurrentHttpServletRequest();
+        Locale locale = Locale.CHINA;
+        if (request != null) {
+            locale = RequestContextUtils.getLocale(request);
+            if (!locale.equals(Locale.CHINA) && !locale.equals(Locale.US)) {
+                locale = Locale.US;
+            }
+        }
+        return locale;
     }
 }
