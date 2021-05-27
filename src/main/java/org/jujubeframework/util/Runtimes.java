@@ -11,10 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 运行时工具类
@@ -25,24 +29,7 @@ import java.net.UnknownHostException;
 public class Runtimes {
 
     public static final char AT_SYMBOL = '@';
-    private static Logger logger = LoggerFactory.getLogger(Runtimes.class);
-    private static String ZK_PATH = "";
-    private static String ZK_BAT_NAME = "startZookeeperServer.bat";
-
-    private static String getZkPath() {
-        if (SystemProperties.WINDOWS && ZK_PATH.length() == 0) {
-            File projectPath = new File(Resources.getProjectPath());
-            while (true) {
-                String name = projectPath.getName();
-                if ("service".equals(name) || "base".equals(name) || "schedule".equals(name) || "application".equals(name) || name.endsWith("-application")) {
-                    break;
-                }
-                projectPath = projectPath.getParentFile();
-            }
-            ZK_PATH = projectPath.getParentFile().getAbsolutePath() + "/alone-server/zookeeper/".replace("/", File.separator);
-        }
-        return ZK_PATH;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(Runtimes.class);
 
     /**
      * 执行命令并获得输出
@@ -69,11 +56,13 @@ public class Runtimes {
      * 执行命令并获得输出
      */
     public static String execCommandAndGetInput(String command, String charset) {
-        String result = "";
+        String result;
         Runtime runtime = Runtime.getRuntime();
         try {
             Process process = runtime.exec(command);
-            result = IOUtils.toString(process.getInputStream(), charset);
+            try (InputStream inputStream = process.getInputStream()) {
+                result = IOUtils.toString(inputStream, charset);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -82,10 +71,15 @@ public class Runtimes {
 
     /**
      * 运行bat文件(仅限windows环境下使用)
+     *
+     * @param batPath
+     *            脚本所在目录
+     * @param batName
+     *            脚本名称
      */
     public static void runBat(String batPath, String batName) {
         Validate.isTrue(SystemProperties.WINDOWS);
-        Process ps = null;
+        Process ps;
         try {
             // 盘符
             String drive = batPath.split(":")[0] + ":";
@@ -106,22 +100,15 @@ public class Runtimes {
     }
 
     /**
-     * 运行zk启动脚步(仅限windows环境下使用)
-     */
-    public static void runZookeeperStartBat() {
-        runBat(getZkPath(), ZK_BAT_NAME);
-    }
-
-    /**
      * 获得java进程id
      *
      * @return java进程id
      */
-    public static final int getPid() {
+    public static int getPid() {
         String pid = System.getProperty("pid");
         if (pid == null) {
-            RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-            String processName = runtimeMXBean.getName();
+            RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+            String processName = runtimeMxBean.getName();
             if (processName.indexOf(AT_SYMBOL) != -1) {
                 pid = processName.substring(0, processName.indexOf('@'));
             }
@@ -135,7 +122,7 @@ public class Runtimes {
     public static String getRuntimeJarName() {
         String input = execCommandAndGetInput("jps -l", "utf-8");
         if (StringUtils.isNotBlank(input)) {
-            String[] arr = input.split("\n|\r");
+            String[] arr = input.split("[\n\r]");
             String vmid = getPid() + " ";
             for (String ele : arr) {
                 if (ele.startsWith(vmid)) {
@@ -174,6 +161,33 @@ public class Runtimes {
                 }
             }
             return "UnknownHost";
+        }
+    }
+
+    /** 运行zk启动脚步(仅限windows环境下使用) */
+    public static void runZookeeperStartBat() {
+        if (SystemProperties.WINDOWS) {
+            String batPath = "";
+            File projectPath = new File(Resources.getProjectPath());
+            // 最多向上查5层
+            for (int i = 0; i < 5; i++) {
+                File[] files = projectPath.getParentFile().listFiles(File::isDirectory);
+                Stream<File> fileStream = Arrays.stream(files).filter(f -> "artfox-3rd-lib".equals(f.getName()));
+                Optional<File> first = fileStream.findFirst();
+                if (first.isPresent()) {
+                    batPath = new File(first.get(), "zookeeper-server").getAbsolutePath();
+                    break;
+                }
+                projectPath = projectPath.getParentFile();
+            }
+            if (batPath.length() == 0) {
+                System.err.print("没有找到artfox-3rd-lib目录，请先git clone artfox-3rd-lib项目，项目地址为：git@git.artfoxlive.com:artfox/artfox-3rd-lib.git");
+                return;
+            }
+            String batName = "startZookeeperServer.bat";
+            runBat(batPath, batName);
+        } else if (SystemProperties.MAC_OS_X) {
+
         }
     }
 }

@@ -1,7 +1,6 @@
 package org.jujubeframework.util;
 
 import freemarker.cache.StringTemplateLoader;
-import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -31,15 +30,16 @@ public class Ftls {
     /**
      * 文件模板
      */
-    private static Configuration file_template_configuration;
+    private static final Configuration FILE_TEMPLATE_CONFIGURATION;
     /**
      * 字符串模板
      */
-    private static Configuration string_template_configuration;
+    private static final Configuration STRING_TEMPLATE_CONFIGURATION;
+
     /**
      * 字符串模板载入器
      */
-    private static StringTemplateLoader stringTemplateLoader;
+    private static final StringTemplateLoader STRING_TEMPLATE_LOADER;
 
     static {
         Properties props = new Properties();
@@ -54,33 +54,35 @@ public class Ftls {
         props.put("number_format", "0.######");
         props.put("whitespace_stripping", "true");
 
-        file_template_configuration = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-
-        file_template_configuration.setTemplateLoader(new ClassloaderTemplateLoader(FTL_DIR));
+        FILE_TEMPLATE_CONFIGURATION = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+        FILE_TEMPLATE_CONFIGURATION.setTemplateLoader(new ClassloaderTemplateLoader(FTL_DIR));
         try {
-            file_template_configuration.setSettings(props);
-        } catch (TemplateException e) {
+            FILE_TEMPLATE_CONFIGURATION.setSettings(props);
+        } catch (TemplateException ignored) {
         }
 
-        string_template_configuration = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-        string_template_configuration.setDefaultEncoding(Charsets.UTF_8.name());
-        stringTemplateLoader = new StringTemplateLoader();
-        string_template_configuration.setTemplateLoader(stringTemplateLoader);
+        STRING_TEMPLATE_CONFIGURATION = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+        STRING_TEMPLATE_CONFIGURATION.setDefaultEncoding(Charsets.UTF_8.name());
+        STRING_TEMPLATE_LOADER = new StringTemplateLoader();
+        STRING_TEMPLATE_CONFIGURATION.setTemplateLoader(STRING_TEMPLATE_LOADER);
         try {
-            string_template_configuration.setSettings(props);
-        } catch (TemplateException e) {
+            STRING_TEMPLATE_CONFIGURATION.setSettings(props);
+        } catch (TemplateException ignored) {
         }
     }
 
     /**
      * 生成模板到文件
      *
-     * @param templateName 模板名称
-     * @param outputPath   输出路径(绝对路径)
-     * @param root         FreeMarker数据模型
+     * @param templateName
+     *            模板名称
+     * @param outputPath
+     *            输出路径(绝对路径)
+     * @param root
+     *            FreeMarker数据模型
      */
     public static void processFileTemplateToFile(String templateName, String outputPath, Map<String, Object> root) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(Files.createFile(outputPath)), Charsets.UTF_8);) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(Files.createFile(outputPath)), Charsets.UTF_8)) {
             processFileTemplateTo(templateName, root, writer);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -90,18 +92,22 @@ public class Ftls {
     /**
      * 生成模板，输出到控制台
      *
-     * @param templateName 模板名称
-     * @param root         FreeMarker数据模型
+     * @param templateName
+     *            模板名称
+     * @param root
+     *            FreeMarker数据模型
      */
     public static void processFileTemplateToConsole(String templateName, Map<String, Object> root) {
         processFileTemplateTo(templateName, root, new OutputStreamWriter(System.out));
     }
 
     /**
-     * 生成模板，输出到控制台
+     * 生成模板，输出String
      *
-     * @param templateName 模板名称
-     * @param root         FreeMarker数据模型
+     * @param templateName
+     *            模板名称
+     * @param root
+     *            FreeMarker数据模型
      */
     public static String processFileTemplateToString(String templateName, Map<String, Object> root) {
         return processTemplateToString(getFileTemplate(templateName), root);
@@ -114,28 +120,32 @@ public class Ftls {
     /**
      * 处理模板源文件，生成内容
      *
-     * @param ftlSource 模板源码
-     * @param map       root
+     * @param ftlSource
+     *            模板源码
+     * @param map
+     *            root
      */
     public static String processStringTemplateToString(String ftlSource, Map<String, Object> map) {
         String defaultFtlName = "default_" + ftlSource.hashCode();
-        stringTemplateLoader.putTemplate(defaultFtlName, ftlSource);
+        STRING_TEMPLATE_LOADER.putTemplate(defaultFtlName, ftlSource);
         try {
-            Template template = string_template_configuration.getTemplate(defaultFtlName);
+            Template template = STRING_TEMPLATE_CONFIGURATION.getTemplate(defaultFtlName);
             return processTemplateToString(template, map);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    /** 获得文件模板 */
     private static Template getFileTemplate(String templateName) {
         try {
-            return file_template_configuration.getTemplate(templateName);
+            return FILE_TEMPLATE_CONFIGURATION.getTemplate(templateName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /** 处理模板到字符串中 */
     private static String processTemplateToString(Template template, Map<String, Object> map) {
         StringWriter result = new StringWriter();
         processTemplateTo(template, map, result);
@@ -150,20 +160,17 @@ public class Ftls {
     private static void processTemplateTo(Template template, Map<String, Object> root, Writer out) {
         try {
             template.process(root, out);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (TemplateException e) {
+        } catch (IOException | TemplateException e) {
             throw new RuntimeException(e);
         }
     }
 
-    static BeansWrapper wrapper = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build();
-    static TemplateHashModel staticModels = wrapper.getStaticModels();
+    private final static TemplateHashModel STATIC_MODELS = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build().getStaticModels();
 
+    /** 导入Class类的静态方法到Freemarker */
     public static TemplateHashModel useStaticPackage(Class<?> clazz) {
         try {
-            TemplateHashModel fileStatics = (TemplateHashModel) staticModels.get(clazz.getName());
-            return fileStatics;
+            return (TemplateHashModel) STATIC_MODELS.get(clazz.getName());
         } catch (Exception e) {
             return null;
         }

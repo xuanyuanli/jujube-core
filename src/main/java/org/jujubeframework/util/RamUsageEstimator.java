@@ -40,7 +40,7 @@ public final class RamUsageEstimator {
     /**
      * JVM diagnostic features.
      */
-    public static enum JvmFeature {
+    public enum JvmFeature {
         /**
          * Object reference size estimated using array index scale
          */
@@ -60,7 +60,7 @@ public final class RamUsageEstimator {
 
         public final String description;
 
-        private JvmFeature(String description) {
+        JvmFeature(String description) {
             this.description = description;
         }
 
@@ -135,14 +135,14 @@ public final class RamUsageEstimator {
 
     static {
         PRIMITIVE_SIZES = new IdentityHashMap<>();
-        PRIMITIVE_SIZES.put(boolean.class, Integer.valueOf(NUM_BYTES_BOOLEAN));
-        PRIMITIVE_SIZES.put(byte.class, Integer.valueOf(NUM_BYTES_BYTE));
-        PRIMITIVE_SIZES.put(char.class, Integer.valueOf(NUM_BYTES_CHAR));
-        PRIMITIVE_SIZES.put(short.class, Integer.valueOf(NUM_BYTES_SHORT));
-        PRIMITIVE_SIZES.put(int.class, Integer.valueOf(NUM_BYTES_INT));
-        PRIMITIVE_SIZES.put(float.class, Integer.valueOf(NUM_BYTES_FLOAT));
-        PRIMITIVE_SIZES.put(double.class, Integer.valueOf(NUM_BYTES_DOUBLE));
-        PRIMITIVE_SIZES.put(long.class, Integer.valueOf(NUM_BYTES_LONG));
+        PRIMITIVE_SIZES.put(boolean.class, NUM_BYTES_BOOLEAN);
+        PRIMITIVE_SIZES.put(byte.class, NUM_BYTES_BYTE);
+        PRIMITIVE_SIZES.put(char.class, NUM_BYTES_CHAR);
+        PRIMITIVE_SIZES.put(short.class, NUM_BYTES_SHORT);
+        PRIMITIVE_SIZES.put(int.class, NUM_BYTES_INT);
+        PRIMITIVE_SIZES.put(float.class, NUM_BYTES_FLOAT);
+        PRIMITIVE_SIZES.put(double.class, NUM_BYTES_DOUBLE);
+        PRIMITIVE_SIZES.put(long.class, NUM_BYTES_LONG);
     }
 
     /**
@@ -160,20 +160,16 @@ public final class RamUsageEstimator {
      */
     private static final EnumSet<JvmFeature> SUPPORTED_FEATURES;
 
-    /**
-     * Initialize constants and try to collect information about the JVM
-     * internals.
-     */
     static {
         // Initialize empirically measured defaults. We'll modify them to the
         // current
         // JVM settings later on if possible.
         int referenceSize = SystemProperties.JRE_IS_64BIT ? 8 : 4;
-        int objectHeader = SystemProperties.JRE_IS_64BIT ? 16 : 8;
+        int objectHeader;
         // The following is objectHeader + NUM_BYTES_INT, but aligned (object
         // alignment)
         // so on 64 bit JVMs it'll be align(16 + 4, @8) = 24.
-        int arrayHeader = SystemProperties.JRE_IS_64BIT ? 24 : 12;
+        int arrayHeader;
 
         SUPPORTED_FEATURES = EnumSet.noneOf(JvmFeature.class);
 
@@ -562,7 +558,7 @@ public final class RamUsageEstimator {
             }
         }
 
-        cachedInfo = new ClassCache(alignObjectSize(shallowInstanceSize), referenceFields.toArray(new Field[referenceFields.size()]));
+        cachedInfo = new ClassCache(alignObjectSize(shallowInstanceSize), referenceFields.toArray(new Field[0]));
         return cachedInfo;
     }
 
@@ -655,7 +651,7 @@ public final class RamUsageEstimator {
      */
     static final class IdentityHashSet<KType> implements Iterable<KType> {
         /**
-         * Default load factor.
+         * Default loadTreeMap factor.
          */
         public static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
@@ -676,7 +672,7 @@ public final class RamUsageEstimator {
         public int assigned;
 
         /**
-         * The load factor for this set (fraction of allocated or deleted slots
+         * The loadTreeMap factor for this set (fraction of allocated or deleted slots
          * before the buffers must be rehashed or reallocated).
          */
         public final float loadFactor;
@@ -687,7 +683,7 @@ public final class RamUsageEstimator {
         private int resizeThreshold;
 
         /**
-         * Creates a hash set with the default capacity of 16. load factor of
+         * Creates a hash set with the default capacity of 16. loadTreeMap factor of
          * {@value #DEFAULT_LOAD_FACTOR}. `
          */
         public IdentityHashSet() {
@@ -695,7 +691,7 @@ public final class RamUsageEstimator {
         }
 
         /**
-         * Creates a hash set with the given capacity, load factor of
+         * Creates a hash set with the given capacity, loadTreeMap factor of
          * {@value #DEFAULT_LOAD_FACTOR}.
          */
         public IdentityHashSet(int initialCapacity) {
@@ -703,7 +699,7 @@ public final class RamUsageEstimator {
         }
 
         /**
-         * Creates a hash set with the given capacity and load factor.
+         * Creates a hash set with the given capacity and loadTreeMap factor.
          */
         public IdentityHashSet(int initialCapacity, float loadFactor) {
             initialCapacity = Math.max(MIN_CAPACITY, initialCapacity);
@@ -788,8 +784,7 @@ public final class RamUsageEstimator {
              * Rehash all assigned slots from the old hash table.
              */
             final int mask = keys.length - 1;
-            for (int i = 0; i < oldKeys.length; i++) {
-                final Object key = oldKeys[i];
+            for (final Object key : oldKeys) {
                 if (key != null) {
                     int slot = rehash(key) & mask;
                     while (keys[slot] != null) {
@@ -866,7 +861,6 @@ public final class RamUsageEstimator {
                     return nextElement != null;
                 }
 
-                @SuppressWarnings("unchecked")
                 @Override
                 public KType next() {
                     Object r = this.nextElement;

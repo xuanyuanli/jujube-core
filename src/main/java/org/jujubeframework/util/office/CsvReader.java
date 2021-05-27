@@ -10,9 +10,9 @@ import org.jujubeframework.constant.Charsets;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,8 +25,8 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class CsvReader implements Iterable<List<String>> {
     private FileInputStream csvInputStream;
-    private File csvFile;
-    private ExcelReaderConfig config;
+    private final File csvFile;
+    private final ExcelReaderConfig config;
     /**
      * 工作薄的总行数
      */
@@ -36,22 +36,38 @@ public class CsvReader implements Iterable<List<String>> {
 
     /**
      * 构造
-     * @param file  csv文件
-     * @param charset  文件编码
-     * @param config  文件读取的一些配置规则
+     *
+     * @param file
+     *            csv文件
+     * @param charset
+     *            文件编码
+     * @param config
+     *            文件读取的一些配置规则
      */
     public CsvReader(File file, Charset charset, ExcelReaderConfig config) {
+        this(file, charset, config, CSVFormat.DEFAULT);
+    }
+
+    /**
+     * 构造
+     *
+     * @param file
+     *            csv文件
+     * @param charset
+     *            文件编码
+     * @param config
+     *            文件读取的一些配置规则
+     */
+    public CsvReader(File file, Charset charset, ExcelReaderConfig config, CSVFormat csvFormat) {
         Validate.notNull(config);
         Validate.isTrue(file.exists(), "file not exists");
         this.config = config;
         this.csvFile = file;
         try {
             csvInputStream = new FileInputStream(csvFile);
-            CSVParser csvParser = CSVParser.parse(csvFile, charset, CSVFormat.DEFAULT);
+            CSVParser csvParser = CSVParser.parse(csvFile, charset, csvFormat);
             csvRecords = csvParser.getRecords();
             rowCount = (int) csvParser.getRecordNumber();
-        } catch (FileNotFoundException e) {
-            log.error("CsvReader", e);
         } catch (IOException e) {
             log.error("CsvReader", e);
         }
@@ -81,15 +97,20 @@ public class CsvReader implements Iterable<List<String>> {
     private List<String> recordToStringList(CSVRecord record) {
         List<String> list = Lists.newArrayList();
         for (String cellContent : record) {
-            if (config.isReplaceCellLineBreak()) {
-                cellContent = cellContent.replaceAll("\\n|\\r", "");
-            }
             if (config.isTrimCellContent()) {
                 cellContent = cellContent.trim();
             }
             list.add(cellContent);
         }
         return list;
+    }
+
+    public List<List<String>> getRows() {
+        List<List<String>> data = new ArrayList<>();
+        for (int i = 0; i < getRowCount(); i++) {
+            data.add(getRow(i));
+        }
+        return data;
     }
 
     private class Itr implements Iterator<List<String>> {

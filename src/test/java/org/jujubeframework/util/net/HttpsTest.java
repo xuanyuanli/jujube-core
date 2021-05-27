@@ -1,9 +1,6 @@
 package org.jujubeframework.util.net;
 
-import com.mashape.unirest.http.Unirest;
-import org.assertj.core.api.Assertions;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HttpsTest {
 

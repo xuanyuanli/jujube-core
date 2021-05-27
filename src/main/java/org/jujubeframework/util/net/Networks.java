@@ -7,6 +7,8 @@ import java.net.*;
 import java.util.Enumeration;
 
 /**
+ * 网络相关工具类
+ * 
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,7 +25,7 @@ public class Networks {
             byte[] mac = NetworkInterface.getByInetAddress(ia).getHardwareAddress();
 
             // 下面代码是把mac地址拼装成String
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < mac.length; i++) {
                 if (i != 0) {
                     sb.append("-");
@@ -77,21 +79,21 @@ public class Networks {
     public static boolean isLocalIp(String qip) {
         try {
             Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
-            InetAddress ip = null;
+            InetAddress ip;
             while (allNetInterfaces.hasMoreElements()) {
-                NetworkInterface netInterface = (NetworkInterface) allNetInterfaces.nextElement();
+                NetworkInterface netInterface = allNetInterfaces.nextElement();
                 if (!netInterface.isUp() || netInterface.isLoopback() || netInterface.isVirtual()) {
                     continue;
                 }
                 Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
-                    ip = (InetAddress) addresses.nextElement();
-                    if (ip != null && ip instanceof Inet4Address && ip.getHostAddress().equals(qip)) {
+                    ip = addresses.nextElement();
+                    if (ip instanceof Inet4Address && ip.getHostAddress().equals(qip)) {
                         return true;
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return false;
     }

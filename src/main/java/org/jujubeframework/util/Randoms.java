@@ -8,7 +8,7 @@ import org.apache.commons.lang3.Validate;
 import java.util.List;
 
 /**
- * 随机数生成类
+ * 随机数生成工具
  *
  * @author John Li
  */
@@ -24,28 +24,38 @@ public class Randoms {
      * 获取范围内的随机整数
      */
     public static int randomInt(int iMin, int iMax) {
+        return (int) random(iMin, iMax, 1, true)[0];
+    }
+
+    /**
+     * 获取范围内的随机整数
+     */
+    public static long randomLong(long iMin, long iMax) {
         return random(iMin, iMax, 1, true)[0];
     }
 
     /**
      * 获取介于iMin和iMax之间的随机数，并根据长度组成数组
      *
-     * @param iMin    随机数的最小值
-     * @param iMax    随机数的最大值
-     * @param iNum    获取几个随机数
-     * @param bRepeat 数组中数字是否允许重复
-     * @return
+     * @param iMin
+     *            随机数的最小值
+     * @param iMax
+     *            随机数的最大值
+     * @param iNum
+     *            获取几个随机数
+     * @param bRepeat
+     *            数组中数字是否允许重复
      */
-    public static int[] random(int iMin, int iMax, int iNum, boolean bRepeat) {
+    public static long[] random(long iMin, long iMax, int iNum, boolean bRepeat) {
         Validate.isTrue(iNum > 0);
         if (!bRepeat) {
             Validate.isTrue(iMax - iMin >= iNum - 1);
         }
 
-        int[] ia = new int[iNum];
-        for (int i = 0; i < iNum; ) {
-            float f2 = (iMax - iMin) * (float) Math.random() + iMin;
-            int i3 = (int) Math.round(f2);
+        long[] ia = new long[iNum];
+        for (int i = 0; i < iNum;) {
+            double f2 = (iMax - iMin) * Math.random() + iMin;
+            long i3 = Math.round(f2);
             if (bRepeat) {
                 ia[i] = i3;
                 i++;
@@ -70,9 +80,9 @@ public class Randoms {
      * 获得随机数字组合
      */
     public static String randomNumber(int iLength) {
-        int[] iCodes = random(0, 9, iLength, true);
+        long[] iCodes = random(0, 9, iLength, true);
         StringBuilder builder = new StringBuilder();
-        for (int i : iCodes) {
+        for (long i : iCodes) {
             builder.append(i);
         }
         return builder.toString();
@@ -82,9 +92,9 @@ public class Randoms {
      * 获得随机数字组合(不重复)
      */
     public static String randomNumberNoRepeat(int iLength) {
-        int[] iCodes = random(0, 9, iLength, false);
+        long[] iCodes = random(0, 9, iLength, false);
         StringBuilder builder = new StringBuilder();
-        for (int i : iCodes) {
+        for (long i : iCodes) {
             builder.append(i);
         }
         return builder.toString();
@@ -93,21 +103,22 @@ public class Randoms {
     /**
      * 生成随机字母与数字组合
      *
-     * @param iLength   随机组合的长度
-     * @param isCapital 是否是大写字母
-     * @return
+     * @param iLength
+     *            随机组合的长度
+     * @param isCapital
+     *            是否是大写字母
      */
     public static String randomCodes(int iLength, boolean isCapital) {
         Validate.isTrue(iLength > 0);
         // 因为是26个字母，10-35是26个数字
-        int[] iCodes = random(0, 35, iLength, true);
-        StringBuffer strb = new StringBuffer();
-        for (int i = 0; i < iCodes.length; i++) {
+        long[] iCodes = random(0, 35, iLength, true);
+        StringBuilder strb = new StringBuilder();
+        for (long iCode : iCodes) {
             // 0-9则为数字，大于10则转换为数字。ASCII中，字母从A开始到z，共有52个。这里只取大写字母
-            if (iCodes[i] >= 0 && iCodes[i] <= 9) {
-                strb.append(iCodes[i]);
+            if (iCode >= 0 && iCode <= 9) {
+                strb.append(iCode);
             } else {
-                char cTmp = (char) ((iCodes[i] - 10) + (isCapital ? 'A' : 'a'));
+                char cTmp = (char) ((iCode - 10) + (isCapital ? 'A' : 'a'));
                 strb.append(cTmp);
             }
         }
@@ -117,8 +128,8 @@ public class Randoms {
     /**
      * 生成随机大写字母与数字组合
      *
-     * @param iLength 随机组合的长度
-     * @return
+     * @param iLength
+     *            随机组合的长度
      */
     public static String randomCodes(int iLength) {
         return randomCodes(iLength, true);
@@ -127,25 +138,27 @@ public class Randoms {
     /**
      * 获得字母组合
      *
-     * @param iLength 组合长度
-     * @param type    字母组合类型。1：大写，2：小写，3：混合
+     * @param iLength
+     *            组合长度
+     * @param type
+     *            字母组合类型。1：大写，2：小写，3：混合
      */
     public static String randomLetter(int iLength, int type) {
         Validate.isTrue(iLength > 0);
         // 26个字母，0-25是26个数字
-        int[] iCodes = random(0, 25, iLength, true);
-        StringBuffer strb = new StringBuffer();
-        for (int i = 0; i < iCodes.length; i++) {
+        long[] iCodes = random(0, 25, iLength, true);
+        StringBuilder strb = new StringBuilder();
+        for (long iCode : iCodes) {
             char cTmp = ' ';
             if (type == 1) {
-                cTmp = (char) (iCodes[i] + 'A');
+                cTmp = (char) (iCode + 'A');
             } else if (type == 2) {
-                cTmp = (char) (iCodes[i] + 'a');
+                cTmp = (char) (iCode + 'a');
             } else if (type == 3) {
                 if (Math.random() >= 0.5) {
-                    cTmp = (char) (iCodes[i] + 'A');
+                    cTmp = (char) (iCode + 'A');
                 } else {
-                    cTmp = (char) (iCodes[i] + 'a');
+                    cTmp = (char) (iCode + 'a');
                 }
             }
             strb.append(cTmp);
@@ -156,16 +169,17 @@ public class Randoms {
     /**
      * 获得常用随机中文字符
      *
-     * @param num 几个字符
+     * @param num
+     *            几个字符
      */
     public static String randomChinese(int num) {
         Validate.isTrue(num > 0);
 
         String str = COMMON_USED_CHINESE;
-        int[] iCodes = random(0, str.length() - 1, num, true);
+        long[] iCodes = random(0, str.length() - 1, num, true);
         StringBuilder strb = new StringBuilder();
-        for (int i = 0; i < iCodes.length; i++) {
-            strb.append(str.charAt(iCodes[i]));
+        for (long iCode : iCodes) {
+            strb.append(str.charAt((int) iCode));
         }
         return strb.toString();
     }
@@ -177,9 +191,9 @@ public class Randoms {
         List<T> collection = Lists.newArrayList();
         size = Math.min(size, source.size());
         if (size > 0) {
-            int[] arr = random(0, source.size() - 1, size, false);
+            long[] arr = random(0, source.size() - 1, size, false);
             for (int i = 0; i < size; i++) {
-                collection.add(source.get(arr[i]));
+                collection.add(source.get((int) arr[i]));
             }
         }
         return collection;

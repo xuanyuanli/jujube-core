@@ -26,7 +26,6 @@ public class SpEls {
      * @param content 文本
      * @param root    EvaluationContext的变量内容
      * @param clazz   要返回的数据类型
-     * @return
      */
     public static <T> T parse(String content, Map<String, Object> root, Class<T> clazz) {
         Validate.notBlank(content);

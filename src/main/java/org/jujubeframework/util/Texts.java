@@ -1,24 +1,28 @@
 package org.jujubeframework.util;
 
-import com.google.common.collect.Maps;
+import lombok.Data;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.jujubeframework.exception.RepeatException;
 import org.jujubeframework.util.support.PatternHolder;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 文本字符相关工具类
+ * 文本字符工具
  *
  * @author John Li Email：jujubeframework@163.com
  */
@@ -32,7 +36,7 @@ public class Texts {
      */
     public static String escapeExprSpecialWord(String keyword) {
         if (StringUtils.isNotBlank(keyword)) {
-            String[] fbsArr = {"\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|"};
+            String[] fbsArr = { "\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|" };
             for (String key : fbsArr) {
                 if (keyword.contains(key)) {
                     keyword = keyword.replace(key, "\\" + key);
@@ -105,6 +109,9 @@ public class Texts {
      * 清楚特殊字符
      */
     public static String cleanSpecialChar(String str) {
+        if (StringUtils.isBlank(str)) {
+            return "";
+        }
         String regEx = "[`~!@#$%^&*()+=|{}':;',//[//].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Pattern p = PatternHolder.getPattern(regEx);
         Matcher m = p.matcher(str);
@@ -115,12 +122,8 @@ public class Texts {
      * 过滤掉超过3个字节的UTF8字符
      */
     public static String filterOffUtf8Mb4(String text) {
-        byte[] bytes = null;
-        try {
-            bytes = text.getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            return text;
-        }
+        byte[] bytes;
+        bytes = text.getBytes(StandardCharsets.UTF_8);
         ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
         int i = 0;
         while (i < bytes.length) {
@@ -150,11 +153,7 @@ public class Texts {
             }
         }
         buffer.flip();
-        try {
-            return new String(buffer.array(), "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            return text;
-        }
+        return new String(buffer.array(), StandardCharsets.UTF_8);
     }
 
     /**
@@ -169,7 +168,7 @@ public class Texts {
      * 手机验证
      */
     public static boolean mobileValidate(String mobile) {
-        String mobileRegex = "^[1][357896]\\d{9}$";
+        String mobileRegex = "^[1]\\d{10}$";
         return find(mobile, mobileRegex);
     }
 
@@ -196,8 +195,8 @@ public class Texts {
     /**
      * 去CSS
      */
-    public static String clearCSS(String content) {
-        content = content.replaceAll("<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>", "");
+    public static String clearCss(String content) {
+        content = content.replaceAll("<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?/[\\s]*?style[\\s]*?>", "");
         content = content.replaceAll("[style|STYLE]\\s*?=\\s*?\".*?\"", "");
         return content;
     }
@@ -221,9 +220,12 @@ public class Texts {
      *     需要注意的是，正则表达式中如果出现特殊字符，需要进行转义。比如：*.$等。"\\$"进行转义
      * </pre>
      *
-     * @param reg    正则表达式
-     * @param repstr 要替换为的字符
-     * @param instr  原始字符串
+     * @param reg
+     *            正则表达式
+     * @param repstr
+     *            要替换为的字符
+     * @param instr
+     *            原始字符串
      * @return 完成替换的字符串
      */
     public static String regReplace(String reg, String repstr, String instr) {
@@ -240,13 +242,16 @@ public class Texts {
     /**
      * 正则查询
      *
-     * @param reg        正则表达式
-     * @param instr      原始字符串
-     * @param ignoreCase 是否忽略大小写
-     * @return 返回多个匹配的信息
+     * @param reg
+     *            正则表达式
+     * @param instr
+     *            原始字符串
+     * @param ignoreCase
+     *            是否忽略大小写
+     * @return 返回自身与多个子匹配的信息
      */
     public static List<RegexQueryInfo> regQuery(String reg, String instr, boolean ignoreCase) {
-        List<RegexQueryInfo> list = new ArrayList<Texts.RegexQueryInfo>();
+        List<RegexQueryInfo> list = new ArrayList<>();
         Pattern pattern = PatternHolder.getPattern(reg, ignoreCase);
         Matcher matcher = pattern.matcher(instr);
         while (matcher.find()) {
@@ -267,11 +272,14 @@ public class Texts {
     /**
      * 正则替换封装
      *
-     * @param reg        正则表达式
-     * @param repstr     要替换为的字符
-     * @param instr      原始字符串
-     * @param ignoreCase 是否忽略大小写
-     * @return
+     * @param reg
+     *            正则表达式
+     * @param repstr
+     *            要替换为的字符
+     * @param instr
+     *            原始字符串
+     * @param ignoreCase
+     *            是否忽略大小写
      */
     public static String regReplace(String reg, String repstr, String instr, boolean ignoreCase) {
         Pattern pattern = PatternHolder.getPattern(reg, ignoreCase);
@@ -283,9 +291,9 @@ public class Texts {
      * 替换字符串str中的中文为str2
      */
     public static String replaceChinese(String str, String str2) {
-        StringBuffer bf = new StringBuffer();
+        StringBuilder bf = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
-            if (String.valueOf(str.charAt(i)).matches("[^x00-xff]*")) {
+            if ("[^x00-xff]*".matches(String.valueOf(str.charAt(i)))) {
                 bf.append(str2);
             } else {
                 bf.append(str.charAt(i));
@@ -297,7 +305,7 @@ public class Texts {
     /**
      * 全角转半角
      */
-    public static String toDBC(String input) {
+    public static String toDbc(String input) {
         char[] c = input.toCharArray();
         for (int i = 0; i < c.length; i++) {
             if (c[i] == '\u3000') {
@@ -306,55 +314,75 @@ public class Texts {
                 c[i] = (char) (c[i] - 65248);
             }
         }
-        String returnString = new String(c);
-        return returnString;
+        return new String(c);
     }
 
     /**
      * 适用于大型字符串分割，可以设置多个分隔符
+     * 
      * <pre>
      *     举例：
      *     String[] s = stringTokenizer("wo; are, student", " ,;");
      *     //s={wo,are,student}
      * </pre>
      *
-     * @param srcString       要分割的字符串
-     * @param tokenizerString 分隔符
+     * @param srcString
+     *            要分割的字符串
+     * @param tokenizerString
+     *            分隔符
      * @return 分割后的数组
      */
     public static String[] stringTokenizer(String srcString, String tokenizerString) {
-        return org.springframework.util.StringUtils.tokenizeToStringArray(srcString,tokenizerString);
+        return org.springframework.util.StringUtils.tokenizeToStringArray(srcString, tokenizerString);
+    }
+
+    /**
+     * 不忽略大小写
+     * 
+     * @see #find(String, String, boolean)
+     */
+    public static boolean find(String source, String regEx) {
+        return find(source, regEx, false);
     }
 
     /**
      * 用正则匹配，查找字符串中有没有相应字符
-     * <pre>举例：find("zfa_999_ic", "zfa_\\d+_ic") = true</pre>
      *
-     * @param source 原字符串
-     * @param regEx  正则表达式
+     * <pre>
+     * 举例：find("zfa_999_ic", "zfa_\\d+_ic") = true
+     * </pre>
+     *
+     * @param source
+     *            原字符串
+     * @param regEx
+     *            正则表达式
+     * @param ignoreCase
+     *            是否忽略大小写
      * @return 是否找到
      */
-    public static boolean find(String source, String regEx) {
+    public static boolean find(String source, String regEx, boolean ignoreCase) {
         if (StringUtils.isBlank(source)) {
             return false;
         }
-        Pattern pat = PatternHolder.getPattern(regEx);
+        Pattern pat = PatternHolder.getPattern(regEx, ignoreCase);
         Matcher mat = pat.matcher(source);
-        boolean rs = mat.find();
-        return rs;
+        return mat.find();
     }
 
     /**
      * 高亮显示关键字(所有匹配的字符都替换)
      *
-     * @param source      原文本
-     * @param keyWord     关键字
-     * @param styleBefore 样式前，例如<font class='red'>
-     * @param styleAfter  样式后,例如</font>
-     * @return
+     * @param source
+     *            原文本
+     * @param keyWord
+     *            关键字
+     * @param styleBefore
+     *            样式前，例如<font class='red'>
+     * @param styleAfter
+     *            样式后,例如</font>
      */
     public static String highlight(String source, String keyWord, String styleBefore, String styleAfter) {
-        int begin = 0;
+        int begin;
         // 加上样式之后的关键字长度
         int len = styleAfter.length() + styleBefore.length() + keyWord.length();
         StringBuilder sb = new StringBuilder(source.length() + len * 5);
@@ -388,10 +416,12 @@ public class Texts {
      * 替换图片路径前缀<br>
      * 有时候图片需要压缩，这时候替换文章内容中出现的图片前缀，通过Apache等服务器的处理，实现压缩的目的
      *
-     * @param content     html格式的文章内容
-     * @param subFragment 前缀截取片段。通过它来确定前缀位置
-     * @param destPrefix  要替换为的前缀
-     * @return
+     * @param content
+     *            html格式的文章内容
+     * @param subFragment
+     *            前缀截取片段。通过它来确定前缀位置
+     * @param destPrefix
+     *            要替换为的前缀
      */
     public static String replaceImageUrlPrefix(String content, String subFragment, String destPrefix) {
         String result = content;
@@ -403,7 +433,7 @@ public class Texts {
                 String path = matcher.group(2);
                 // 三种情况：1、path包含前缀截取片段。则确定前缀位置，进行前缀替换
                 if (path.contains(subFragment)) {
-                    String subPath = "";
+                    String subPath;
                     int pathPrefixIndex = path.indexOf(subFragment) + subFragment.length();
                     subPath = path.substring(pathPrefixIndex);
                     result = result.replace(path, destPrefix + subPath);
@@ -478,9 +508,9 @@ public class Texts {
      */
     public static String getFirstLetterArr(String str) {
         Validate.notBlank(str);
-        StringBuffer sBuffer = new StringBuffer();
+        StringBuilder sBuffer = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
-            Character c = str.charAt(i);
+            char c = str.charAt(i);
             if (isChinese(c)) {
                 sBuffer.append(getFirstLetter(String.valueOf(c)));
             }
@@ -491,8 +521,10 @@ public class Texts {
     /**
      * 得到汉字的拼音
      *
-     * @param content 汉字
-     * @param type    1、拼音都为小写且带声调；2、拼音都为小写不带声调；3、拼音首字母大写不带声调；
+     * @param content
+     *            汉字
+     * @param type
+     *            1、拼音都为小写且带声调；2、拼音都为小写不带声调；3、拼音首字母大写不带声调；
      */
     public static String getLetter(String content, int type) {
         Validate.notBlank(content);
@@ -503,7 +535,7 @@ public class Texts {
 
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < content.length(); i++) {
-            Character c = content.charAt(i);
+            char c = content.charAt(i);
             if (isChinese(c)) {
                 String pinyin = PinyinHelper.toHanyuPinyinStringArray(c)[0];
                 if (type == 2) {
@@ -518,10 +550,12 @@ public class Texts {
         return result.toString();
     }
 
+    /** 是否是英文字母 */
     public static boolean isEn(char c) {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
+    /** 是否是数字 */
     public static boolean isNumeric(char c) {
         return Character.isDigit(c);
     }
@@ -539,7 +573,7 @@ public class Texts {
     public static boolean isScientificNotation(String str) {
         try {
             BigDecimal bd = new BigDecimal(str);
-            bd.toPlainString();
+            String s = bd.toPlainString();
         } catch (Exception e) {
             return false;
         }
@@ -547,11 +581,18 @@ public class Texts {
     }
 
     /**
+     * @see #getGroups(String, String,boolean)
+     */
+    public static String[] getGroups(String regex, String source) {
+        return getGroups(regex, source, false);
+    }
+
+    /**
      * 和JavaScript中RegExp对象的exec()方法一样<br>
      * 只返回第一个匹配的结果，数组中第一个元素包含正则表达式匹配的字符串，余下的元素是与圆括号内的子表达式相匹配的子串
      */
-    public static String[] getGroups(String regex, String source) {
-        Pattern pattern = PatternHolder.getPattern(regex);
+    public static String[] getGroups(String regex, String source, boolean ignoreCase) {
+        Pattern pattern = PatternHolder.getPattern(regex, ignoreCase);
         Matcher matcher = pattern.matcher(source);
         String[] groups = new String[0];
         if (matcher.find()) {
@@ -568,7 +609,14 @@ public class Texts {
      * 获取匹配到的文本
      */
     public static String getGroup(String regex, String source) {
-        Pattern pattern = PatternHolder.getPattern(regex);
+        return getGroup(regex, source, false);
+    }
+
+    /**
+     * 获取匹配到的文本
+     */
+    public static String getGroup(String regex, String source, boolean ignoreCase) {
+        Pattern pattern = PatternHolder.getPattern(regex, ignoreCase);
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
             return matcher.group();
@@ -579,11 +627,28 @@ public class Texts {
     /**
      * 对lines进行分组处理
      *
-     * @param lines         数据
-     * @param groupFunction 获得group name的function：入参为line，返回groupName
+     * @param lines
+     *            数据
+     * @param groupFunction
+     *            获得group name的function：入参为line，返回groupName
      * @return 分组后的lines
      */
     public static Map<String, List<String>> group(List<String> lines, Function<String, String> groupFunction) {
+        return group(lines, groupFunction, true);
+    }
+
+    /**
+     * 对lines进行分组处理
+     *
+     * @param lines
+     *            数据
+     * @param groupFunction
+     *            获得group name的function：入参为line，返回groupName
+     * @param allowRepeat
+     *            是否允许重复，如果为false，有重复元素的话会抛出RepeatException
+     * @return 分组后的lines
+     */
+    public static Map<String, List<String>> group(List<String> lines, Function<String, String> groupFunction, boolean allowRepeat) {
         Map<String, List<String>> group = new LinkedHashMap<>();
         List<String> part = new ArrayList<>();
         // 先找出第一个groupName
@@ -601,6 +666,9 @@ public class Texts {
             String line = lines.get(j);
             String curGroupName = groupFunction.apply(line);
             if (StringUtils.isNotBlank(curGroupName)) {
+                if (!allowRepeat && group.containsKey(groupName)) {
+                    throw new RepeatException(groupName);
+                }
                 group.put(groupName, part);
                 // 因为group中元素都在group下面，so...
                 groupName = curGroupName;
@@ -609,6 +677,9 @@ public class Texts {
                 part.add(line);
             }
         }
+        if (!allowRepeat && group.containsKey(groupName)) {
+            throw new RepeatException(groupName);
+        }
         group.put(groupName, part);
         return group;
     }
@@ -616,8 +687,10 @@ public class Texts {
     /**
      * 对分组后的数据进行再分组
      *
-     * @param group         分组后的数据
-     * @param groupFunction 获得sub group name的function：入参为组下元素，返回sub group name
+     * @param group
+     *            分组后的数据
+     * @param groupFunction
+     *            获得sub group name的function：入参为组下元素，返回sub group name
      * @return 再分组后的数据
      */
     public static Map<String, Map<String, List<String>>> groupAgain(Map<String, List<String>> group, Function<String, String> groupFunction) {
@@ -668,7 +741,7 @@ public class Texts {
     }
 
     /**
-     * 格式化字符串，仿C#
+     * 格式化字符串，仿C#。或直接用{}，仿log.info()
      *
      * <pre>
      * str = Hello {0}
@@ -676,10 +749,12 @@ public class Texts {
      * #result = Hello World!
      * </pre>
      *
-     * @param pattern 待匹配字符串
-     * @param params  参数数组
+     * @param pattern
+     *            待匹配字符串
+     * @param params
+     *            参数数组
      */
-    public static String format(String pattern, String... params) {
+    public static String format(String pattern, Object... params) {
         String regex = "\\{\\d+\\}";
         int count = regQuery(regex, pattern).size();
         String symbol = "{}";
@@ -690,7 +765,7 @@ public class Texts {
             }
             String result = pattern;
             for (int i = 0; i < count; i++) {
-                String replacement = params[i];
+                String replacement = params[i] == null ? "" : params[i].toString();
                 if (replacement == null) {
                     replacement = "";
                 }
@@ -700,14 +775,14 @@ public class Texts {
         }
         // 或者直接{}这种形式
         else if (pattern.contains(symbol)) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             // 防止{}出现在最后一行
             pattern += " ";
-            String[] arr = pattern.split("\\{\\}");
+            String[] arr = pattern.split("\\{}");
             for (int i = 0; i < arr.length - 1; i++) {
-                result += arr[i] + (params.length <= i ? "" : params[i]);
+                result.append(arr[i]).append(params.length <= i ? "" : params[i] == null ? "" : params[i].toString());
                 if (i == arr.length - 2) {
-                    result += arr[i + 1];
+                    result.append(arr[i + 1]);
                 }
             }
             return result.substring(0, result.length() - 1);
@@ -716,35 +791,85 @@ public class Texts {
         }
     }
 
-    public static String toA(String href, String title, boolean blank) {
+    /** 生成a标签 */
+    public static String generateAtag(String href, String title, boolean blank) {
         return format("<a href=\"{0}\" target=\"{1}\">{2}</a>", href, blank ? "_blank" : "", title);
+    }
+
+    /**
+     * 字符截断。如果超出某个长度，则后跟‘...’。默认英文字符按照0.5个长度计算，中文字符按照一个长度计算
+     *
+     * @param source
+     *            原始字符
+     * @param trancationNum
+     *            截断的字符数
+     */
+    public static String truncate(String source, int trancationNum) {
+        return truncate(source, trancationNum, true);
     }
 
     /**
      * 字符截断。如果超出trancationNum，则后跟‘...’
      *
-     * @param source        原始字符
-     * @param trancationNum 截断的字符数
+     * @param source
+     *            原始字符
+     * @param trancationNum
+     *            截断的字符数
+     * @param calcEnLen
+     *            是否英文字符按照0.5个长度计算
      */
-    public static String truncate(String source, int trancationNum) {
+    public static String truncate(String source, int trancationNum, boolean calcEnLen) {
         if (StringUtils.isBlank(source)) {
             return "";
         }
-        if (source.length() > trancationNum) {
-            return source.substring(0, trancationNum) + "...";
+        String result;
+        int slen = source.length();
+        if (calcEnLen) {
+            float len = 0.0f;
+            int i = 0;
+            for (; i < source.length(); i++) {
+                if (isChinese(source.charAt(i))) {
+                    len += 1;
+                } else {
+                    len += 0.5;
+                }
+                if (len >= trancationNum) {
+                    break;
+                }
+            }
+            int cur = i + 1;
+            if (cur >= slen) {
+                result = source;
+            } else {
+                result = source.substring(0, cur) + "...";
+            }
         } else {
-            return source;
+            if (slen > trancationNum) {
+                result = source.substring(0, trancationNum) + "...";
+            } else {
+                result = source;
+            }
         }
+        return result;
     }
 
+    /**
+     * @see NumberUtils#toLong(String)
+     */
     public static long toLong(String source) {
         return NumberUtils.toLong(source);
     }
 
+    /**
+     * @see NumberUtils#toDouble(String)
+     */
     public static double toDouble(String source) {
         return NumberUtils.toDouble(source);
     }
 
+    /**
+     * @see NumberUtils#toInt(String)
+     */
     public static int toInt(String source) {
         return NumberUtils.toInt(source);
     }
@@ -753,38 +878,60 @@ public class Texts {
      * 只取字符串中的数字
      */
     public static int parseInt(String source) {
-        StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(source)) {
-            for (int i = 0; i < source.length(); i++) {
-                char ch = source.charAt(i);
-                if (Character.isDigit(ch)) {
-                    builder.append(ch);
-                }
-            }
-        }
-        return NumberUtils.toInt(builder.toString());
+        return Numbers.parseInt(source);
+    }
+
+    /** 首字母大写 */
+    public static String capitalize(String str) {
+        return StringUtils.capitalize(str);
     }
 
     /**
-     * Map的toString方法获得的字符串，现在转换为Map的toJson格式
+     * 获得遮掩的名称，用**表示中间的字符（用于脱敏）
+     *
+     * @param num：中间*的个数
+     * @param prefixNum：*前面显示的个数
+     * @param suffixNum：*后面显示的个数
      */
-    public static Map<String, String> mapStringToJson(String source) {
-        String symbol = "=";
-        if (Dynamics.bool(source) && source.contains(symbol)) {
-            Map<String, String> map = Maps.newHashMap();
-            source = source.replace("{", "").replace("}", "");
-            String[] arr = source.split(", ");
-            for (String ele : arr) {
-                String[] arr2 = ele.split(symbol);
-                map.put(arr2[0], arr2[1]);
-            }
-            return map;
+    public static String getHideName(String source, int num, int prefixNum, int suffixNum) {
+        String result = source;
+        if (num < 0) {
+            num = 3;
         }
-        throw new IllegalArgumentException();
+        if (prefixNum < 0) {
+            prefixNum = 1;
+        }
+        if (suffixNum < 0) {
+            suffixNum = prefixNum;
+        }
+
+        StringBuilder middle = new StringBuilder();
+        for (int i = 0; i < num; i++) {
+            middle.append("*");
+        }
+        if (StringUtils.isBlank(source)) {
+            return result;
+        }
+        if (source.length() > prefixNum) {
+            int endLen = source.length() - suffixNum;
+            if (endLen > suffixNum) {
+                endLen = suffixNum;
+            }
+            result = source.substring(0, prefixNum) + middle + source.substring(source.length() - endLen);
+        } else {
+            result = source + middle;
+        }
+        return result;
     }
 
-    public static String capitalize(String str) {
-        return StringUtils.capitalize(str);
+    /**
+     * 判断输入项是否为Ip地址
+     */
+    public static boolean isIp(String ipAddress) {
+        String test = "([1-9]|[1-9]//d|1//d{2}|2[0-1]//d|22[0-3])(//.(//d|[1-9]//d|1//d{2}|2[0-4]//d|25[0-5])){3}";
+        Pattern pattern = Pattern.compile(test);
+        Matcher matcher = pattern.matcher(ipAddress);
+        return matcher.matches();
     }
 
     /**
@@ -792,68 +939,22 @@ public class Texts {
      * <p>
      * 类中三个字段参考Matcher类
      */
+    @Data
     public static class RegexQueryInfo {
-        /**整个正则匹配到的字符*/
+        /** 整个正则匹配到的字符 */
         private String group;
         private int start;
         private int end;
-        /**正则中每个括号匹配到的字符集合，从0开始。例如用(a)(b)去匹配'ab'，groups的size=2*/
+        /** 正则中每个括号匹配到的字符集合，从0开始。例如用(a)(b)去匹配'ab'，groups的size=2 */
         private List<String> groups;
-
-        public String getGroup() {
-
-            return group;
-        }
-
-        public void setGroup(String group) {
-            this.group = group;
-        }
-
-        public int getStart() {
-            return start;
-        }
-
-        public void setStart(int start) {
-            this.start = start;
-        }
-
-        public int getEnd() {
-            return end;
-        }
-
-        public void setEnd(int end) {
-            this.end = end;
-        }
-
-        public List<String> getGroups() {
-            return groups;
-        }
-
-        public void setGroups(List<String> groups) {
-            this.groups = groups;
-        }
 
     }
 
     /**
-     * 手机电话号码中间用星号代替
+     * 反替换html中的转义字符
      */
-    public static String hidePhone(String source) {
-        String result = "";
-        if (!Dynamics.bool(source)) {
-            return "";
-        }
-        String asterisk = "****";
-        int length = source.length();
-        int hindex = (int) Math.ceil(length / 2);
-        hindex += 1;
-        int five = 5;
-        if (length > five) {
-            result = source.substring(0, hindex - 3) + asterisk + source.substring(hindex + 1);
-        } else {
-            result = source.substring(0, 1) + asterisk + source.substring(length - 1);
-        }
-        return result;
+    public static String unescapeHtml(String str) {
+        return StringEscapeUtils.unescapeHtml4(str);
     }
 
 }

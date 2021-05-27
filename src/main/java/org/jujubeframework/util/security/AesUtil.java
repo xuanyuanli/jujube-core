@@ -17,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AesUtil {
-    private static Logger logger = LoggerFactory.getLogger(AesUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(AesUtil.class);
 
     public static final String DEFAULT_ENCRYPT_KEY = "XXCYW-AES";
 
@@ -25,6 +25,9 @@ public class AesUtil {
 
     /**
      * 对数据加密
+     *
+     * @param data 被加密的数据
+     * @param key  密钥
      */
     public static String encrypt(String data, String key) {
         try {
@@ -43,6 +46,9 @@ public class AesUtil {
 
     /**
      * 对数据解密
+     *
+     * @param data 被解密的数据
+     * @param key  密钥
      */
     public static String decrypt(String data, String key) {
         try {

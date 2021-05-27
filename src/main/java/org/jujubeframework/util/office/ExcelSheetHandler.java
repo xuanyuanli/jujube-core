@@ -10,8 +10,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 public interface ExcelSheetHandler {
     /**
      * handler
-     *
-     * @param sheet
      */
     void handler(Sheet sheet);
 }

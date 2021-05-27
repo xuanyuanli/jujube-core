@@ -5,9 +5,10 @@ import lombok.NoArgsConstructor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DecimalFormat;
 
 /**
+ * 异常工具
+ * 
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,6 +39,5 @@ public class Exceptions {
         }
         return data;
     }
-
 
 }

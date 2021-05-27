@@ -4,7 +4,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.Sets;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DynamicsTest {
 

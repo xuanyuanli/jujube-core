@@ -1,21 +1,20 @@
 package org.jujubeframework.constant;
 
 import org.assertj.core.api.Assertions;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ProfilesTest {
 
     @Test
     public void setSpringProfileAsSystemProperty() {
-        Profiles.setSpringProfileAsSystemProperty(Profiles.PRODUCTION);
-        Assertions.assertThat(Profiles.getSpringProfileAsSystemProperty()).isEqualTo(Profiles.PRODUCTION);
+        Profiles.setSpringProfileToSystemProperty(Profiles.PRODUCTION);
+        Assertions.assertThat(Profiles.getSpringProfileFromSystemProperty()).isEqualTo(Profiles.PRODUCTION);
     }
 
     @Test
     public void getSpringProfileAsSystemProperty() {
-        Profiles.setSpringProfileAsSystemProperty(Profiles.PRODUCTION);
-        Assertions.assertThat(Profiles.getSpringProfileAsSystemProperty()).isEqualTo(Profiles.PRODUCTION);
+        Profiles.setSpringProfileToSystemProperty(Profiles.PRODUCTION);
+        Assertions.assertThat(Profiles.getSpringProfileFromSystemProperty()).isEqualTo(Profiles.PRODUCTION);
     }
 
 }

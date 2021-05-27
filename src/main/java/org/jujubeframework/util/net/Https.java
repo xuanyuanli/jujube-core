@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 public class Https {
     public static final String SET_TIMEOUTS = "setTimeouts";
     public static final String SET_CONCURRENCY = "setConcurrency";
-    private static ConcurrentMap<String, Boolean> GLOB_BOOL = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Boolean> GLOB_BOOL = new ConcurrentHashMap<>();
 
     /**
      * 获得页面返回码
@@ -75,6 +75,7 @@ public class Https {
         }
     }
 
+    /** 根据url获得stream流 */
     public static InputStream getAsStream(String url) {
         try {
             return Unirest.get(url).asBinary().getBody();

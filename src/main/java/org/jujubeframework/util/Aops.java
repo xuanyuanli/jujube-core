@@ -5,14 +5,16 @@ import lombok.NoArgsConstructor;
 import org.springframework.aop.framework.AopContext;
 
 /**
- * spring aop的辅助工具类
+ * spring aop的辅助工具类<br>
+ *     对于Spring Boot来说，需要在配置文件中配置：spring.aop.auto=false<br>
+ *     还需要在启动类上加上注解：@EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass = true)
  *
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Aops {
     /**
-     * 为了解决循环aop调用,要使用这个方法。另：spring默认的代理必须为cglib，且exposeProxy=true <br>
+     * 为了解决循环aop调用,要使用这个方法
      * 用法：
      *
      * <pre>
@@ -21,13 +23,12 @@ public class Aops {
      *
      * @param t t一般入参为this，而this只能是类对象，不可能是代理类，这一点要注意
      */
-    @SuppressWarnings("unchecked")
     public static <T> T getSelf(T t) {
         try {
-            T curT = (T) AopContext.currentProxy();
+            T currentProxy = (T) AopContext.currentProxy();
             // 有时出现currentProxy和t类型不一致，这里做一下判断
-            if (curT.getClass().getSuperclass().equals(t.getClass())) {
-                return curT;
+            if (currentProxy.getClass().isInterface() || currentProxy.getClass().getSuperclass().equals(t.getClass())) {
+                return currentProxy;
             }
         } catch (IllegalStateException e) {
             // 一般会报错：Cannot find current proxy: Set 'exposeProxy' property on

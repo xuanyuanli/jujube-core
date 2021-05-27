@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.jujubeframework.util.BeansTest;
 import org.jujubeframework.util.DataGenerator;
 import org.jujubeframework.util.RamUsageEstimator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;

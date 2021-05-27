@@ -4,13 +4,18 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jujubeframework.util.Calcs;
+import org.jujubeframework.util.Files;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
+ * Excel读取工具类
+ * 
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -31,13 +36,14 @@ public class ExcelReaderUtil {
      * 如果我们需要的类型为String，而excle中用户填写了类似2001的数字，那么获得实际值的时候会变成：2001.0(excel自动转换)，
      * 这是不符合要求的； 使用这个方法 ，可以获得预期的类型真实值
      *
-     * @param value 实际值
+     * @param value
+     *            实际值
      * @return 预期的真实值
      */
     public static String toExpectStringValue(String value) {
         String result = value;
         double convertDouble = NumberUtils.toDouble(value, -1);
-        if (convertDouble != DEFAULT_VALUE) {
+        if (!Calcs.equ(convertDouble, DEFAULT_VALUE)) {
             result = String.valueOf((int) convertDouble);
         }
         return result;
@@ -61,7 +67,7 @@ public class ExcelReaderUtil {
      * 剔除模板表头各个单元格中的特殊字符，然后返回
      */
     public static List<String> templateTitlesToStandardAttrs(List<String> row) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (String cell : row) {
             list.add(rejectSpecialChar(cell));
         }
@@ -72,7 +78,7 @@ public class ExcelReaderUtil {
      * 剔除特殊字符
      */
     public static String rejectSpecialChar(String title) {
-        return title.replaceAll("\\*|\\/|\\(|\\)|（|）|￥|\\$|#|%|&|_|-|=|\\+|\\{|\\}|\\[|\\]|'|\"|\\,|\\.|，|。|\\?|？", "");
+        return title.replaceAll("[*/()（）￥$#%&_\\-=+{}\\[\\]'\",.，。?？]", "");
     }
 
     /**
@@ -87,5 +93,13 @@ public class ExcelReaderUtil {
         } catch (ParseException e) {
             return 0;
         }
+    }
+
+    /**
+     * 根据后缀判断是否是excle
+     */
+    public static boolean isExcelFile(String fileName) {
+        String extention = Files.getExtention(fileName);
+        return Objects.equals(extention, ".xls") || Objects.equals(extention, ".xlsx");
     }
 }

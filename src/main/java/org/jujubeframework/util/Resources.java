@@ -19,17 +19,17 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Predicate;
 
 /**
+ * 资源工具
+ * 
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Resources {
-    private static Logger logger = LoggerFactory.getLogger(Resources.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(Resources.class);
     static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
-    private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    private static final ResourcePatternResolver RESOURCE_PATTERN_RESOLVER = new PathMatchingResourcePatternResolver();
 
     /**
      * 获得包下的所有class
@@ -38,7 +38,7 @@ public class Resources {
         List<Class<?>> list = Lists.newArrayList();
         String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(packageName) + "/" + DEFAULT_RESOURCE_PATTERN;
         try {
-            Resource[] resources = resourcePatternResolver.getResources(packageSearchPath);
+            Resource[] resources = RESOURCE_PATTERN_RESOLVER.getResources(packageSearchPath);
             for (Resource resource : resources) {
                 if (resource.isReadable()) {
                     String filePath = URLDecoder.decode(resource.getURL().getFile(), "UTF-8");
@@ -47,8 +47,7 @@ public class Resources {
                         try {
                             Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(getRealPackageName(filePath, packageName) + "." + className);
                             list.add(clazz);
-                        } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                            continue;
+                        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {
                         }
                     }
                 }
@@ -59,6 +58,7 @@ public class Resources {
         return list;
     }
 
+    /** 获得真实的文件系统的包路径 */
     private static String getRealPackageName(String filePath, String packageName) {
         String pName = packageName.replace(".", "/");
         String tPath = filePath.substring(filePath.indexOf(pName));
@@ -69,7 +69,8 @@ public class Resources {
     /**
      * 获取所有classpath下对应名称的Properties文件属性
      *
-     * @param fileName 相对于classpath的文件位置
+     * @param fileName
+     *            相对于classpath的文件位置
      */
     public static Properties getProperties(String fileName) {
         if (StringUtils.isBlank(fileName)) {
@@ -81,11 +82,11 @@ public class Resources {
             Resource[] resources = getClassPathAllResources(fileName);
             for (int i = resources.length - 1; i >= 0; i--) {
                 Resource resource = resources[i];
-                properties.load(resource.getInputStream());
-                logger.debug("load properties:{}", resource.getURL());
+                try (InputStream inputStream = resource.getInputStream()) {
+                    properties.load(inputStream);
+                }
+                logger.debug("loadTreeMap properties:{}", resource.getURL());
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -95,7 +96,8 @@ public class Resources {
     /**
      * 获取当前classpath下对应名称的Properties文件属性
      *
-     * @param fileName 相对于classpath的文件位置
+     * @param fileName
+     *            相对于classpath的文件位置
      */
     public static Properties getCurrentClasspathProperties(String fileName) {
         if (StringUtils.isBlank(fileName)) {
@@ -106,9 +108,9 @@ public class Resources {
         Resource resource = getClassPathResources(fileName);
         try (InputStream inputStream = resource.getInputStream()) {
             properties.load(inputStream);
-            logger.debug("load properties:{}", resource.getURL());
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            logger.debug("loadTreeMap properties:{}", resource.getURL());
+        } catch (FileNotFoundException f) {
+            // ignored
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -121,8 +123,8 @@ public class Resources {
     public static Resource[] getClassPathAllResources(String resourceName) {
         Resource[] resources = null;
         try {
-            resources = resourcePatternResolver.getResources("classpath*:" + resourceName);
-        } catch (IOException e) {
+            resources = RESOURCE_PATTERN_RESOLVER.getResources("classpath*:" + resourceName);
+        } catch (IOException ignored) {
         }
         return resources;
     }
@@ -133,8 +135,8 @@ public class Resources {
     public static Resource getClassPathResources(String resourceName) {
         Resource[] resources = null;
         try {
-            resources = resourcePatternResolver.getResources("classpath:" + resourceName);
-        } catch (IOException e) {
+            resources = RESOURCE_PATTERN_RESOLVER.getResources("classpath:" + resourceName);
+        } catch (IOException ignored) {
         }
         return resources != null && resources.length > 0 ? resources[0] : null;
     }
@@ -143,7 +145,7 @@ public class Resources {
      * 获得当前的classpath目录
      */
     public static File getCurrentClasspath() {
-        Resource resource = resourcePatternResolver.getResource("classpath:./");
+        Resource resource = RESOURCE_PATTERN_RESOLVER.getResource("classpath:./");
         try {
             return resource.getFile();
         } catch (IOException e) {
@@ -165,8 +167,7 @@ public class Resources {
                     dir = dir.getParentFile();
                 }
             }
-            String projectDir = dir.getParentFile().getAbsolutePath();
-            return projectDir;
+            return dir.getParentFile().getAbsolutePath();
         }
         return null;
     }
@@ -192,5 +193,16 @@ public class Resources {
      */
     public static boolean isJarStartByClass(Class<?> cl) {
         return "jar".equals(cl.getResource(cl.getSimpleName() + ".class").getProtocol());
+    }
+
+    /**
+     * 获得classpath下的指定资源--InputStream
+     */
+    public static InputStream getClassPathResourcesInputStream(String path) {
+        try {
+            return getClassPathResources(path).getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

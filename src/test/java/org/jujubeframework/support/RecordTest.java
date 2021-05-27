@@ -3,7 +3,7 @@ package org.jujubeframework.support;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.jujubeframework.lang.Record;
 import org.jujubeframework.util.Dates;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -72,7 +72,8 @@ public class RecordTest {
 
     @Test
     public void getNumber() {
-
+        Record record = new Record().set("key", new BigDecimal(1.22));
+        assertThat(record.getNumber("key")).isEqualTo(new BigDecimal(1.22));
     }
 
     @Test
@@ -83,6 +84,7 @@ public class RecordTest {
 
     @Test
     public void valueOf() {
+        Record record = new Record().set("id", "123");
     }
 
     @Test

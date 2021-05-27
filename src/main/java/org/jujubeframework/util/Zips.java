@@ -1,13 +1,5 @@
 package org.jujubeframework.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -16,12 +8,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * zip压缩处理
  * <p>
  * copy from zeroturnaround。URL：https://github.com/zeroturnaround/zt-zip
  * <p>
- * zt-zip的逻辑在解压缩的时候，没有顾及编码问题，会出现中文乱码，下面有几个编码的注意点：
+ * zt-zip在解压缩的时候，没有顾及编码问题，会出现中文乱码，下面有几个编码的注意点：
  * <ul>
  * <li>解压缩的时候，出现这种情况：上传的压缩文件是在Windows环境下压缩而成的（编码GBK），而在Linux服务器端系统编码为UTF-8。
  * 这时候正确解压编码为GBK。解压之前，调用构造来设置解压缩编码</li>
@@ -32,8 +30,6 @@ import java.util.zip.ZipOutputStream;
  *
  * @author John Li Email：jujubeframework@163.com
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class Zips {
     private final String PATH_SEPARATOR = "/";
 
@@ -85,8 +81,8 @@ public class Zips {
         boolean result = false;
         try {
             zf = new ZipFile(zip, defaultEncoding);
-            for (int i = 0; i < names.length; i++) {
-                if (zf.getEntry(names[i]) != null) {
+            for (String name : names) {
+                if (zf.getEntry(name) != null) {
                     result = true;
                     break;
                 }
@@ -262,8 +258,8 @@ public class Zips {
         try {
             zf = new ZipFile(zip, defaultEncoding);
 
-            for (int i = 0; i < entryNames.length; i++) {
-                ZipEntry e = zf.getEntry(entryNames[i]);
+            for (String entryName : entryNames) {
+                ZipEntry e = zf.getEntry(entryName);
                 if (e == null) {
                     continue;
                 }
@@ -296,7 +292,7 @@ public class Zips {
         try {
             zf = new ZipFile(zip, defaultEncoding);
 
-            Enumeration en = (Enumeration<ZipEntry>) zf.entries();
+            Enumeration en = zf.entries();
             while (en.hasMoreElements()) {
                 ZipEntry e = (ZipEntry) en.nextElement();
                 try {
@@ -330,8 +326,8 @@ public class Zips {
         try {
             zf = new ZipFile(zip, defaultEncoding);
 
-            for (int i = 0; i < entryNames.length; i++) {
-                ZipEntry e = zf.getEntry(entryNames[i]);
+            for (String entryName : entryNames) {
+                ZipEntry e = zf.getEntry(entryName);
                 if (e == null) {
                     continue;
                 }
@@ -629,12 +625,7 @@ public class Zips {
     public void pack(final File sourceDir, final File targetZipFile, final boolean preserveRoot) {
         if (preserveRoot) {
             final String parentName = sourceDir.getName();
-            pack(sourceDir, targetZipFile, new NameMapper() {
-                @Override
-                public String map(String name) {
-                    return parentName + PATH_SEPARATOR + name;
-                }
-            });
+            pack(sourceDir, targetZipFile, name -> parentName + PATH_SEPARATOR + name);
         } else {
             pack(sourceDir, targetZipFile);
         }
@@ -669,9 +660,7 @@ public class Zips {
             fos = new FileOutputStream(destZipFile);
             out = new ZipOutputStream(new BufferedOutputStream(fos), defaultEncoding);
 
-            for (int i = 0; i < filesToPack.length; i++) {
-                File fileToPack = filesToPack[i];
-
+            for (File fileToPack : filesToPack) {
                 ZipEntry zipEntry = new ZipEntry(fileToPack.getName());
                 zipEntry.setSize(fileToPack.length());
                 zipEntry.setTime(fileToPack.lastModified());
@@ -745,8 +734,7 @@ public class Zips {
             throw new IOException("Given file is not a directory '" + dir + "'");
         }
 
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        for (File file : files) {
             boolean isDir = file.isDirectory();
             String path = pathPrefix + file.getName();
             if (isDir) {
@@ -839,14 +827,14 @@ public class Zips {
      */
     private class RepackZipEntryCallback implements ZipEntryCallback {
 
-        private ZipOutputStream out;
+        private final ZipOutputStream out;
 
         private RepackZipEntryCallback(File dstZip, int compressionLevel) {
             try {
                 this.out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(dstZip)), defaultEncoding);
                 this.out.setLevel(compressionLevel);
             } catch (IOException e) {
-                rethrow(e);
+                throw new ZipException(e);
             }
         }
 
@@ -918,8 +906,8 @@ public class Zips {
         ZipOutputStream out = null;
         try {
             out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zip)), defaultEncoding);
-            for (int i = 0; i < entries.length; i++) {
-                addEntry(entries[i], out);
+            for (ZipEntrySource entry : entries) {
+                addEntry(entry, out);
             }
         } catch (IOException e) {
             throw rethrow(e);
@@ -1029,8 +1017,8 @@ public class Zips {
         try {
             out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destZip)), defaultEncoding);
             copyEntries(zip, out);
-            for (int i = 0; i < entries.length; i++) {
-                addEntry(entries[i], out);
+            for (ZipEntrySource entry : entries) {
+                addEntry(entry, out);
             }
         } catch (IOException e) {
             throw rethrow(e);
@@ -1135,15 +1123,12 @@ public class Zips {
         // this one doesn't call copyEntries with ignoredEntries, because that
         // has poorer performance
         final Set names = new HashSet();
-        iterate(zip, new ZipEntryCallback() {
-            @Override
-            public void process(InputStream in, ZipEntry zipEntry) throws IOException {
-                String entryName = zipEntry.getName();
-                if (names.add(entryName)) {
-                    copyEntry(zipEntry, in, out);
-                } else if (log.isDebugEnabled()) {
-                    log.info("Duplicate entry: {}", entryName);
-                }
+        iterate(zip, (in, zipEntry) -> {
+            String entryName = zipEntry.getName();
+            if (names.add(entryName)) {
+                copyEntry(zipEntry, in, out);
+            } else if (log.isDebugEnabled()) {
+                log.info("Duplicate entry: {}", entryName);
             }
         });
     }
@@ -1159,27 +1144,23 @@ public class Zips {
     private void copyEntries(File zip, final ZipOutputStream out, final Set ignoredEntries) {
         final Set names = new HashSet();
         final Set dirNames = filterDirEntries(zip, ignoredEntries);
-        iterate(zip, new ZipEntryCallback() {
-            @Override
-            public void process(InputStream in, ZipEntry zipEntry) throws IOException {
-                String entryName = zipEntry.getName();
-                if (ignoredEntries.contains(entryName)) {
+        iterate(zip, (in, zipEntry) -> {
+            String entryName = zipEntry.getName();
+            if (ignoredEntries.contains(entryName)) {
+                return;
+            }
+
+            for (Object name : dirNames) {
+                String dirName = (String) name;
+                if (entryName.startsWith(dirName)) {
                     return;
                 }
+            }
 
-                Iterator iter = dirNames.iterator();
-                while (iter.hasNext()) {
-                    String dirName = (String) iter.next();
-                    if (entryName.startsWith(dirName)) {
-                        return;
-                    }
-                }
-
-                if (names.add(entryName)) {
-                    copyEntry(zipEntry, in, out);
-                } else if (log.isDebugEnabled()) {
-                    log.info("Duplicate entry: {}", entryName);
-                }
+            if (names.add(entryName)) {
+                copyEntry(zipEntry, in, out);
+            } else if (log.isDebugEnabled()) {
+                log.info("Duplicate entry: {}", entryName);
             }
         });
     }
@@ -1197,9 +1178,8 @@ public class Zips {
         ZipFile zf = null;
         try {
             zf = new ZipFile(zip, defaultEncoding);
-            Iterator iterator = names.iterator();
-            while (iterator.hasNext()) {
-                String entryName = (String) iterator.next();
+            for (Object name : names) {
+                String entryName = (String) name;
                 ZipEntry entry = zf.getEntry(entryName);
                 if (entry.isDirectory()) {
                     dirs.add(entry.getName());
@@ -1324,19 +1304,16 @@ public class Zips {
             final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destZip)), defaultEncoding);
             try {
                 final Set names = new HashSet();
-                iterate(zip, new ZipEntryCallback() {
-                    @Override
-                    public void process(InputStream in, ZipEntry zipEntry) throws IOException {
-                        if (names.add(zipEntry.getName())) {
-                            ZipEntrySource entry = (ZipEntrySource) entryByPath.remove(zipEntry.getName());
-                            if (entry != null) {
-                                addEntry(entry, out);
-                            } else {
-                                copyEntry(zipEntry, in, out);
-                            }
-                        } else if (log.isDebugEnabled()) {
-                            log.info("Duplicate entry: {}", zipEntry.getName());
+                iterate(zip, (in, zipEntry) -> {
+                    if (names.add(zipEntry.getName())) {
+                        ZipEntrySource entry = (ZipEntrySource) entryByPath.remove(zipEntry.getName());
+                        if (entry != null) {
+                            addEntry(entry, out);
+                        } else {
+                            copyEntry(zipEntry, in, out);
                         }
+                    } else if (log.isDebugEnabled()) {
+                        log.info("Duplicate entry: {}", zipEntry.getName());
                     }
                 });
             } finally {
@@ -1382,25 +1359,22 @@ public class Zips {
             try {
                 // Copy and replace entries
                 final Set names = new HashSet();
-                iterate(zip, new ZipEntryCallback() {
-                    @Override
-                    public void process(InputStream in, ZipEntry zipEntry) throws IOException {
-                        if (names.add(zipEntry.getName())) {
-                            ZipEntrySource entry = (ZipEntrySource) entryByPath.remove(zipEntry.getName());
-                            if (entry != null) {
-                                addEntry(entry, out);
-                            } else {
-                                copyEntry(zipEntry, in, out);
-                            }
-                        } else if (log.isDebugEnabled()) {
-                            log.info("Duplicate entry: {}", zipEntry.getName());
+                iterate(zip, (in, zipEntry) -> {
+                    if (names.add(zipEntry.getName())) {
+                        ZipEntrySource entry = (ZipEntrySource) entryByPath.remove(zipEntry.getName());
+                        if (entry != null) {
+                            addEntry(entry, out);
+                        } else {
+                            copyEntry(zipEntry, in, out);
                         }
+                    } else if (log.isDebugEnabled()) {
+                        log.info("Duplicate entry: {}", zipEntry.getName());
                     }
                 });
 
                 // Add new entries
-                for (Iterator it = entryByPath.values().iterator(); it.hasNext(); ) {
-                    addEntry((ZipEntrySource) it.next(), out);
+                for (Object o : entryByPath.values()) {
+                    addEntry((ZipEntrySource) o, out);
                 }
             } finally {
                 closeQuietly(out);
@@ -1431,8 +1405,7 @@ public class Zips {
      */
     Map byPath(ZipEntrySource[] entries) {
         Map result = new HashMap(entries.length);
-        for (int i = 0; i < entries.length; i++) {
-            ZipEntrySource source = entries[i];
+        for (ZipEntrySource source : entries) {
             result.put(source.getPath(), source);
         }
         return result;
@@ -1443,9 +1416,8 @@ public class Zips {
      */
     Map byPath(Collection entries) {
         Map result = new HashMap(entries.size());
-        Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            ZipEntrySource source = (ZipEntrySource) iter.next();
+        for (Object entry : entries) {
+            ZipEntrySource source = (ZipEntrySource) entry;
             result.put(source.getPath(), source);
         }
         return result;
@@ -1606,7 +1578,7 @@ public class Zips {
             if (zf != null) {
                 zf.close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -1622,7 +1594,7 @@ public class Zips {
      *
      * @author shelajev
      */
-    private abstract class BaseInPlaceAction {
+    private abstract static class BaseInPlaceAction {
 
         /**
          * act
@@ -1660,7 +1632,7 @@ public class Zips {
         }
     }
 
-    public class ZipException extends RuntimeException {
+    public static class ZipException extends RuntimeException {
 
         private static final long serialVersionUID = -2429392488218867015L;
 
@@ -1817,7 +1789,7 @@ public class Zips {
 
     }
 
-    public class FileSource implements ZipEntrySource {
+    public static class FileSource implements ZipEntrySource {
 
         private final String path;
         private final File file;
@@ -1858,7 +1830,7 @@ public class Zips {
 
     }
 
-    public class ByteSource implements ZipEntrySource {
+    public static class ByteSource implements ZipEntrySource {
 
         private final String path;
         private final byte[] bytes;
@@ -1870,7 +1842,7 @@ public class Zips {
 
         public ByteSource(String path, byte[] bytes, long time) {
             this.path = path;
-            this.bytes = (byte[]) bytes.clone();
+            this.bytes = bytes.clone();
             this.time = time;
         }
 
@@ -1890,7 +1862,7 @@ public class Zips {
         }
 
         @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             if (bytes == null) {
                 return null;
             } else {
@@ -1905,7 +1877,7 @@ public class Zips {
 
     }
 
-    public class ZipBreakException extends RuntimeException {
+    public static class ZipBreakException extends RuntimeException {
         private static final long serialVersionUID = 5863129897045964421L;
 
         public ZipBreakException(String msg) {

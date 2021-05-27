@@ -17,11 +17,11 @@ import java.io.*;
  */
 @Slf4j
 public class Ftps {
-    private String ip;
-    private int port;
-    private String username;
-    private String password;
-    private String account;
+    private final String ip;
+    private final int port;
+    private final String username;
+    private final String password;
+    private final String account;
 
     private String systemKey = FTPClientConfig.SYST_UNIX;
     private String serverLanguageCode = FTP.DEFAULT_CONTROL_ENCODING;
@@ -96,11 +96,13 @@ public class Ftps {
     /**
      * 下载文件
      *
-     * @param ftpFilePath   ftp文件地址
-     * @param localFilePath 下载到本地的地址
+     * @param ftpFilePath
+     *            ftp文件地址
+     * @param localFilePath
+     *            下载到本地的地址
      */
     public boolean download(String ftpFilePath, String localFilePath) {
-        boolean result = true;
+        boolean result;
         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(localFilePath))) {
             result = ftpClient.retrieveFile(ftpFilePath, fos);
             fos.flush();
@@ -114,8 +116,10 @@ public class Ftps {
     /**
      * 重命名文件
      *
-     * @param oldFileName 原文件名
-     * @param newFileName 新文件名
+     * @param oldFileName
+     *            原文件名
+     * @param newFileName
+     *            新文件名
      */
     public boolean renameFile(String oldFileName, String newFileName) {
         try {
@@ -129,7 +133,8 @@ public class Ftps {
     /**
      * 在服务器上创建一个文件夹
      *
-     * @param dir 文件夹名称，不能含有特殊字符，如 \ 、/ 、: 、* 、?、 "、 &lt;、&gt;...
+     * @param dir
+     *            文件夹名称，不能含有特殊字符，如 \ 、/ 、: 、* 、?、 "、 &lt;、&gt;...
      */
     public boolean makeDirectory(String dir) {
         try {
@@ -156,7 +161,7 @@ public class Ftps {
      * 删除目录
      */
     public boolean deleteDirectory(String pathname) {
-        boolean flag = true;
+        boolean flag;
         try {
             File file = new File(pathname);
             if (file.isDirectory()) {
@@ -174,8 +179,10 @@ public class Ftps {
     /**
      * 上传文件到服务器
      *
-     * @param localFile 本地文件
-     * @param destPath  服务器绝对路径（包含文件名）
+     * @param localFile
+     *            本地文件
+     * @param destPath
+     *            服务器绝对路径（包含文件名）
      */
     public boolean uploadFile(File localFile, final String destPath) {
         boolean flag = true;
@@ -189,8 +196,6 @@ public class Ftps {
             ftpClient.changeWorkingDirectory(destFile.getParent());
 
             flag = ftpClient.storeFile(destFile.getName(), localFileInput);
-        } catch (IOException e) {
-            log.error("uploadFile", e);
         } catch (Exception e) {
             log.error("uploadFile", e);
         }
@@ -211,7 +216,8 @@ public class Ftps {
     /**
      * 设置ftp服务端的操作系统
      *
-     * @param systemKey 参考：FTPClientConfig.SYST_*
+     * @param systemKey
+     *            参考：FTPClientConfig.SYST_*
      */
     public void setSystemKey(String systemKey) {
         this.systemKey = systemKey;
@@ -220,7 +226,8 @@ public class Ftps {
     /**
      * 设置服务器语言编码
      *
-     * @param serverLanguageCode 默认为FTP.DEFAULT_CONTROL_ENCODING
+     * @param serverLanguageCode
+     *            默认为FTP.DEFAULT_CONTROL_ENCODING
      */
     public void setServerLanguageCode(String serverLanguageCode) {
         this.serverLanguageCode = serverLanguageCode;
@@ -229,7 +236,8 @@ public class Ftps {
     /**
      * 设置bufferSize
      *
-     * @param bufSize 默认为1024
+     * @param bufSize
+     *            默认为1024
      */
     public void setBufSize(int bufSize) {
         this.bufSize = bufSize;
@@ -238,7 +246,8 @@ public class Ftps {
     /**
      * 设置fileType，可选值：FTP.*_FILE_TYPE
      *
-     * @param fileType 默认为二进制传输
+     * @param fileType
+     *            默认为二进制传输
      */
     public void setFileType(int fileType) {
         this.fileType = fileType;
@@ -247,7 +256,8 @@ public class Ftps {
     /**
      * 设置root工作目录
      *
-     * @param rootWorkingDirectory 默认ftp服务器端操作系统为linux，所以root工作目录为"/"
+     * @param rootWorkingDirectory
+     *            默认ftp服务器端操作系统为linux，所以root工作目录为"/"
      */
     public void setRootWorkingDirectory(String rootWorkingDirectory) {
         this.rootWorkingDirectory = rootWorkingDirectory;

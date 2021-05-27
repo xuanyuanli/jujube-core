@@ -1,15 +1,19 @@
 package org.jujubeframework.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Map;
+
+import org.jujubeframework.lang.Record;
+import org.junit.jupiter.api.Test;
+
 import com.google.common.collect.Lists;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import static org.assertj.core.api.Assertions.assertThat;
-import org.jujubeframework.lang.Record;
-import org.junit.Test;
-
-import java.util.List;
 
 public class Collections3Test {
 
@@ -84,7 +88,7 @@ public class Collections3Test {
 
     @Test
     public void testToDiffArray() {
-        String[] arr = {"1", "1", "2"};
+        String[] arr = { "1", "1", "2" };
         assertThat(Collections3.toDiffArray(arr)).hasSize(2);
     }
 
@@ -103,7 +107,16 @@ public class Collections3Test {
         ChildUser user2 = (ChildUser) new ChildUser().setCardId(123L).setName("ef");
         ChildUser user3 = (ChildUser) new ChildUser().setCardId(36L).setName("df");
         List<ChildUser> data = Lists.newArrayList(user, user2, user3);
-        assertThat(Collections3.extractToListString(data, "name")).hasSize(3).contains("bc", "df", "ef");
+        assertThat(Collections3.extractToList(data, "name")).hasSize(3).contains("bc", "df", "ef");
+    }
+
+    @Test
+    public void testExtractToList2() {
+        ChildUser user = (ChildUser) new ChildUser().setCardId(12L).setName("bc");
+        ChildUser user2 = (ChildUser) new ChildUser().setCardId(123L).setName("ef");
+        ChildUser user3 = (ChildUser) new ChildUser().setCardId(36L).setName("df");
+        List<ChildUser> data = Lists.newArrayList(user, user2, user3);
+        assertThat(Collections3.extractToList(data, "cardId", int.class)).hasSize(3).contains(12, 123, 36);
     }
 
     @Test
@@ -152,8 +165,22 @@ public class Collections3Test {
         ChildUser user2 = (ChildUser) new ChildUser().setCardId(12L).setName("ef");
         ChildUser user3 = (ChildUser) new ChildUser().setCardId(123L).setName("df");
         List<ChildUser> data = Lists.newArrayList(user, user2, user3);
-        List<ChildUser> list = Collections3.distinctByProperty(data, "cardId");
+        List<ChildUser> list = Collections3.deWeight(data, ChildUser::getCardId);
         assertThat(list).hasSize(2);
     }
 
+    @Test
+    public void newHashMap() {
+        Map<String, Double> map = Collections3.newHashMap("A", 1D, "C", 8D);
+        assertThat(map).hasSize(2);
+        assertThat(map.get("A")).isEqualTo(1D);
+
+        Map<String, Object> map2 = Collections3.newHashMap("A", 1D, "C", "4");
+        assertThat(map2).hasSize(2);
+        assertThat(map2.get("C")).isEqualTo("4");
+
+        Map<String, Object> map3 = Collections3.newHashMap(102L, 1D, 202, "4");
+        assertThat(map3).hasSize(2);
+        assertThat(map3.get("202")).isEqualTo("4");
+    }
 }

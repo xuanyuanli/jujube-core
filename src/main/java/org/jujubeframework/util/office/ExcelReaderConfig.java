@@ -1,47 +1,39 @@
 package org.jujubeframework.util.office;
 
 /**
- * TableDataReader的配置器
+ * ExcelReader的配置器
  *
  * @author John Li Email：jujubeframework@163.com
  */
 public class ExcelReaderConfig {
     /**
-     * 是否替换单元格中的换行符和制表符
-     */
-    private boolean replaceCellLineBreak;
-    /**
-     * 设置 是否替换单元格中的换行符和制表符。默认为false
+     * 设置 是否trim单元格中的内容。默认为false
      */
     private boolean trimCellContent;
     /**
-     * 是否trim单元格内容
+     * 计算excel总行数时，是否遇到空行，则终止
      */
     private boolean blankLineTerminated;
 
-    public static final ExcelReaderConfig DEFAULT = new ExcelReaderConfig(true, true, false);
+    public static final ExcelReaderConfig DEFAULT = new ExcelReaderConfig(true, false);
     /**
      * 所有参数默认为ture
      */
-    public static final ExcelReaderConfig ALL_RIGHT = new ExcelReaderConfig(true, true, true);
+    public static final ExcelReaderConfig ALL_RIGHT = new ExcelReaderConfig(true, true);
+
+    /**
+     * 所有参数默认为false
+     */
+    public static final ExcelReaderConfig ALL_FALSE = new ExcelReaderConfig(false, false);
 
     public ExcelReaderConfig() {
         super();
     }
 
-    public ExcelReaderConfig(boolean replaceCellLineBreak, boolean trimCellContent, boolean blankLineTerminated) {
+    public ExcelReaderConfig(boolean trimCellContent, boolean blankLineTerminated) {
         super();
-        this.replaceCellLineBreak = replaceCellLineBreak;
         this.trimCellContent = trimCellContent;
         this.blankLineTerminated = blankLineTerminated;
-    }
-
-    public boolean isReplaceCellLineBreak() {
-        return replaceCellLineBreak;
-    }
-
-    public void setReplaceCellLineBreak(boolean replaceCellLineBreak) {
-        this.replaceCellLineBreak = replaceCellLineBreak;
     }
 
     public boolean isTrimCellContent() {

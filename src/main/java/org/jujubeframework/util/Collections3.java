@@ -3,7 +3,6 @@ package org.jujubeframework.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +10,9 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * 集合工具类。区别于jdk的Collections和guava的Collections2
@@ -22,35 +23,28 @@ import java.util.stream.Collectors;
 public class Collections3 {
 
     /**
-     * 提取集合中的对象的一个属性(通过Getter函数), 组合成List&lt;String&gt;.
-     * <br>
+     * 提取集合中的对象的一个属性(通过Getter函数), 组合成List&lt;String&gt;. <br>
      * 不同于Collections3，这里返回String集合
      *
-     * @param collection   来源集合.
-     * @param propertyName 要提取的属性名.
+     * @param collection
+     *            来源集合.
+     * @param propertyName
+     *            要提取的属性名.
      */
     public static List<String> extractToListString(final Collection<?> collection, final String propertyName) {
-        List<String> list = new ArrayList<>(collection.size());
-
-        try {
-            for (Object obj : collection) {
-                list.add(Beans.getPropertyAsString(obj, propertyName));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return list;
+        return collection.stream().map(obj -> Beans.getPropertyAsString(obj, propertyName)).collect(Collectors.toList());
     }
 
     /**
      * 依据某个字段对集合进行排序,获取字段值的时候采用getProperty方式
      *
-     * @param list      待排序的集合
-     * @param fieldName 依据这个字段进行排序
-     * @param asc       如果为true，是正序；为false，为倒序
+     * @param list
+     *            待排序的集合
+     * @param fieldName
+     *            依据这个字段进行排序
+     * @param asc
+     *            如果为true，是正序；为false，为倒序
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public static void sort(List list, String fieldName, boolean asc) {
         if (list == null || list.size() == 0) {
             return;
@@ -65,34 +59,34 @@ public class Collections3 {
             // 逆序
             mycmp = ComparatorUtils.reversedComparator(mycmp);
         }
-        Collections.sort(list, new BeanComparator(fieldName, mycmp));
+        list.sort(new BeanComparator(fieldName, mycmp));
     }
 
     /**
      * 根据条件，从集合中取出一个
      *
-     * @param coll      集合
-     * @param fieldName 字段名
-     * @param value     字段值
+     * @param coll
+     *            集合
+     * @param fieldName
+     *            字段名
+     * @param value
+     *            字段值
      */
     public static <T> T getOne(Collection<T> coll, String fieldName, Object value) {
         Validate.notNull(coll);
-        T result = null;
-        for (T t : coll) {
-            if (value.equals(Beans.getProperty(t, fieldName))) {
-                result = t;
-                break;
-            }
-        }
-        return result;
+        Optional<T> first = coll.stream().filter(t -> value.equals(Beans.getProperty(t, fieldName))).findFirst();
+        return first.orElse(null);
     }
 
     /**
      * 根据条件，从集合中取出符合条件的部分
      *
-     * @param coll      集合
-     * @param fieldName 字段名
-     * @param value     字段值
+     * @param coll
+     *            集合
+     * @param fieldName
+     *            字段名
+     * @param value
+     *            字段值
      * @author John Li Email：jujubeframework@163.com
      */
     public static <T> List<T> getPart(Collection<T> coll, String fieldName, Object value) {
@@ -104,63 +98,72 @@ public class Collections3 {
      * 字符串数组去重
      */
     public static String[] toDiffArray(String[] s) {
-        Set<String> set = new LinkedHashSet<String>();
-        for (String sa : s) {
-            set.add(sa);
-        }
-        return set.toArray(new String[]{});
+        Set<String> set = new LinkedHashSet<>();
+        Collections.addAll(set, s);
+        return set.toArray(new String[] {});
     }
 
     /**
      * 对数组进行trim，摒弃数组中的空值
      */
     public static String[] trim(String[] params) {
-        List<String> result = new ArrayList<>();
-        for (String string : params) {
-            if (!StringUtils.isBlank(string.trim()) || !"".equals(string)) {
-                result.add(string);
-            }
-        }
-        return result.toArray(new String[0]);
+        return Arrays.stream(params).filter(StringUtils::isNotBlank).toArray(String[]::new);
     }
 
     /**
      * 提取集合中的对象的两个属性(通过Getter函数), 组合成Map.
      *
-     * @param collection        来源集合.
-     * @param keyPropertyName   要提取为Map中的Key值的属性名.
-     * @param valuePropertyName 要提取为Map中的Value值的属性名.
+     * @param collection
+     *            来源集合.
+     * @param keyPropertyName
+     *            要提取为Map中的Key值的属性名.
+     * @param valuePropertyName
+     *            要提取为Map中的Value值的属性名.
      */
     public static <T> Map<Object, Object> extractToMap(final Collection<T> collection, final String keyPropertyName, final String valuePropertyName) {
         Map<Object, Object> map = new HashMap<>(collection.size());
-
         try {
             for (Object obj : collection) {
-                map.put(PropertyUtils.getProperty(obj, keyPropertyName), PropertyUtils.getProperty(obj, valuePropertyName));
+                map.put(Beans.getProperty(obj, keyPropertyName), Beans.getProperty(obj, valuePropertyName));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
         return map;
     }
 
     /**
      * 提取集合中的对象的一个属性(通过Getter函数), 组合成List.
      *
-     * @param collection   来源集合.
-     * @param propertyName 要提取的属性名.
+     * @param collection
+     *            来源集合.
+     * @param propertyName
+     *            要提取的属性名.
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public static <T> List<T> extractToList(final Collection collection, final String propertyName) {
+        return extractToList(collection, propertyName, null);
+    }
+
+    /**
+     * 提取集合中的对象的一个属性(通过Getter函数), 组合成List.
+     *
+     * @param collection
+     *            来源集合.
+     * @param propertyName
+     *            要提取的属性名.
+     */
+    public static <T> List<T> extractToList(final Collection collection, final String propertyName, Class<T> expectType) {
         if (collection == null) {
             return null;
         }
         List list = new ArrayList(collection.size());
-
         try {
             for (Object obj : collection) {
-                list.add(PropertyUtils.getProperty(obj, propertyName));
+                Object property = Beans.getProperty(obj, propertyName);
+                if (expectType != null) {
+                    property = Beans.getExpectTypeValue(property, expectType);
+                }
+                list.add(property);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -172,11 +175,13 @@ public class Collections3 {
     /**
      * 提取集合中的对象的一个属性(通过Getter函数), 组合成由分割符分隔的字符串.
      *
-     * @param collection   来源集合.
-     * @param propertyName 要提取的属性名.
-     * @param separator    分隔符.
+     * @param collection
+     *            来源集合.
+     * @param propertyName
+     *            要提取的属性名.
+     * @param separator
+     *            分隔符.
      */
-    @SuppressWarnings({"rawtypes"})
     public static String extractToString(final Collection collection, final String propertyName, final String separator) {
         List list = extractToList(collection, propertyName);
         return StringUtils.join(list, separator);
@@ -185,7 +190,6 @@ public class Collections3 {
     /**
      * 转换Collection所有元素(通过toString())为String, 中间以 separator分隔。
      */
-    @SuppressWarnings({"rawtypes"})
     public static String convertToString(final Collection collection, final String separator) {
         return StringUtils.join(collection, separator);
     }
@@ -194,7 +198,6 @@ public class Collections3 {
      * 转换Collection所有元素(通过toString())为String,
      * 每个元素的前面加入prefix，后面加入postfix，如<div>mymessage</div>。
      */
-    @SuppressWarnings({"rawtypes"})
     public static String convertToString(final Collection collection, final String prefix, final String postfix) {
         StringBuilder builder = new StringBuilder();
         for (Object o : collection) {
@@ -204,68 +207,31 @@ public class Collections3 {
     }
 
     /**
-     * 判断是否为空.
+     * 判断集合是否为空.
      */
-    @SuppressWarnings({"rawtypes"})
     public static boolean isEmpty(Collection collection) {
         return (collection == null) || collection.isEmpty();
     }
 
     /**
-     * 判断是否为空.
+     * 判断Map是否为空.
      */
-    @SuppressWarnings({"rawtypes"})
     public static boolean isEmpty(Map map) {
         return (map == null) || map.isEmpty();
     }
 
     /**
-     * 判断是否为空.
+     * 判断集合是否为非空.
      */
-    @SuppressWarnings({"rawtypes"})
     public static boolean isNotEmpty(Collection collection) {
         return (collection != null) && !(collection.isEmpty());
-    }
-
-    /**
-     * 取得Collection的第一个元素，如果collection为空返回null.
-     */
-    public static <T> T getFirst(Collection<T> collection) {
-        if (isEmpty(collection)) {
-            return null;
-        }
-        return collection.iterator().next();
-    }
-
-    /**
-     * 获取Collection的最后一个元素 ，如果collection为空返回null.
-     */
-    public static <T> T getLast(Collection<T> collection) {
-        if (isEmpty(collection)) {
-            return null;
-        }
-
-        // 当类型为List时，直接取得最后一个元素 。
-        if (collection instanceof List) {
-            List<T> list = (List<T>) collection;
-            return list.get(list.size() - 1);
-        }
-
-        // 其他类型通过iterator滚动到最后一个元素.
-        Iterator<T> iterator = collection.iterator();
-        while (true) {
-            T current = iterator.next();
-            if (!iterator.hasNext()) {
-                return current;
-            }
-        }
     }
 
     /**
      * 返回a+b的新List.
      */
     public static <T> List<T> union(final Collection<T> a, final Collection<T> b) {
-        List<T> result = new ArrayList<T>(a);
+        List<T> result = new ArrayList<>(a);
         result.addAll(b);
         return result;
     }
@@ -274,18 +240,14 @@ public class Collections3 {
      * 返回a-b(集合a中有，而b中没有)的新List.
      */
     public static <T> List<T> subtract(final Collection<T> a, final Collection<T> b) {
-        List<T> list = new ArrayList<>(a);
-        for (Object element : b) {
-            list.remove(element);
-        }
-        return list;
+        return a.stream().filter(t -> !b.contains(t)).collect(Collectors.toList());
     }
 
     /**
      * 返回a与b的交集的新List.
      */
     public static <T> List<T> intersection(Collection<T> a, Collection<T> b) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
 
         for (T element : a) {
             if (b.contains(element)) {
@@ -296,7 +258,7 @@ public class Collections3 {
     }
 
     public static <T> List<T> enumerationToList(Enumeration<T> enumeration) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         while (enumeration.hasMoreElements()) {
             list.add(enumeration.nextElement());
         }
@@ -319,13 +281,8 @@ public class Collections3 {
      */
     public static <K, V> Map<K, V> sortMapByKey(Map<K, V> map, Comparator<K> comparator) {
         Map<K, V> result = new LinkedHashMap<>();
-        List<Map.Entry<K, V>> entryList = new ArrayList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort(entryList, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(Entry<K, V> o1, Entry<K, V> o2) {
-                return comparator.compare(o1.getKey(), o2.getKey());
-            }
-        });
+        List<Map.Entry<K, V>> entryList = new ArrayList<>(map.entrySet());
+        entryList.sort((o1, o2) -> comparator.compare(o1.getKey(), o2.getKey()));
         for (Entry<K, V> entry : entryList) {
             result.put(entry.getKey(), entry.getValue());
         }
@@ -337,13 +294,8 @@ public class Collections3 {
      */
     public static <K, V> Map<K, V> sortMapByValue(Map<K, V> map, Comparator<V> comparator) {
         Map<K, V> result = new LinkedHashMap<>();
-        List<Map.Entry<K, V>> entryList = new ArrayList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort(entryList, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(Entry<K, V> o1, Entry<K, V> o2) {
-                return comparator.compare(o1.getValue(), o2.getValue());
-            }
-        });
+        List<Map.Entry<K, V>> entryList = new ArrayList<>(map.entrySet());
+        entryList.sort((o1, o2) -> comparator.compare(o1.getValue(), o2.getValue()));
         for (Entry<K, V> entry : entryList) {
             result.put(entry.getKey(), entry.getValue());
         }
@@ -360,16 +312,16 @@ public class Collections3 {
         return source.stream().anyMatch(t -> detectVal.equals(Beans.getProperty(t, fieldName)));
     }
 
-    /**
-     * 根据某个字段去重
-     */
-    public static <T> List<T> distinctByProperty(Collection<T> serverServices, String propertyName) {
-        List<T> list = new ArrayList<>();
-        Set<Object> diffArray = new HashSet<>(extractToList(serverServices, propertyName));
-        for (Object val : diffArray) {
-            list.add(getOne(serverServices, propertyName, val));
-        }
-        return list;
+    /** 根据某个字段去重 */
+    public static <T> List<T> deWeight(List<T> list, Function<T, ?> function) {
+        Set<Object> uids = new HashSet<>();
+        return list.stream().filter(u -> {
+            if (uids.contains(function.apply(u))) {
+                return false;
+            }
+            uids.add(function.apply(u));
+            return true;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -383,4 +335,29 @@ public class Collections3 {
         return set;
     }
 
+    public static <V> Map<String, V> newHashMap(Object... keyValue) {
+        Map<String, V> map = new HashMap<>(16);
+        if (keyValue == null || keyValue.length == 0) {
+            return map;
+        }
+        if (keyValue.length % 2 != 0) {
+            throw new IllegalArgumentException();
+        }
+        for (int i = 0; i < keyValue.length; i += 2) {
+            map.put(String.valueOf(keyValue[i]), (V) keyValue[i + 1]);
+        }
+        return map;
+    }
+
+
+    /**
+     * 迭代器转换为List
+     */
+    public static <T> List<T> getListFromIterator(Iterator<T> iterator) {
+        // Convert iterator to iterable
+        Iterable<T> iterable = () -> iterator;
+        // Create a List from the Iterable
+        // Return the List
+        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+    }
 }

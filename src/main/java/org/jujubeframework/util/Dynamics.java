@@ -19,9 +19,7 @@ public class Dynamics {
     public static <T> List<T> listOf(T... t) {
         List<T> list = new ArrayList<>();
         if (t != null) {
-            for (T ele : t) {
-                list.add(ele);
-            }
+            Collections.addAll(list, t);
         }
         return list;
     }
@@ -38,18 +36,18 @@ public class Dynamics {
         return set;
     }
 
-    public static void println(String pattern, String... params) {
+    public static void println(String pattern, Object... params) {
         System.out.println(Texts.format(pattern, params));
     }
 
-    public static void print(String pattern, String... params) {
+    public static void print(String pattern, Object... params) {
         System.out.print(Texts.format(pattern, params));
     }
 
     /**
-     * @see Texts#format(String, String...)
+     * @see Texts#format(String, Object...)
      */
-    public static String format(String pattern, String... params) {
+    public static String format(String pattern, Object... params) {
         return Texts.format(pattern, params);
     }
 
@@ -67,32 +65,21 @@ public class Dynamics {
     /**
      * 模仿js中对象转为bool的判断
      */
-    @SuppressWarnings("rawtypes")
     public static boolean bool(Object obj) {
         if (obj == null) {
             return false;
         }
         if (obj instanceof String) {
-            if (((String) obj).length() == 0) {
-                return false;
-            }
+            return ((String) obj).length() != 0;
         } else if (obj instanceof Number) {
-            if (((Number) obj).intValue() == 0) {
-                return false;
-            }
+            return ((Number) obj).intValue() != 0;
         } else if (obj instanceof Collection) {
-            if (((Collection) obj).isEmpty()) {
-                return false;
-            }
+            return !((Collection) obj).isEmpty();
         } else if (obj instanceof Map) {
-            if (((Map) obj).isEmpty()) {
-                return false;
-            }
+            return !((Map) obj).isEmpty();
         } else if (obj.getClass().isArray()) {
             Object[] objs = (Object[]) obj;
-            if (objs.length <= 0) {
-                return false;
-            }
+            return objs.length > 0;
         } else if (obj instanceof Boolean) {
             return (Boolean) obj;
         }

@@ -17,7 +17,6 @@ public class DataGenerator {
     /**
      * 填充一个对象（一般用于测试）
      */
-    @SuppressWarnings("unchecked")
     public static <T> T fullObject(Class<T> cl) {
         if (cl == null) {
             throw new IllegalArgumentException("参数不能为null");
@@ -32,28 +31,7 @@ public class DataGenerator {
             if (method.getName().indexOf("set") == 0) {
                 Class<?> paramClass = method.getParameterTypes()[0];
                 try {
-                    if (paramClass.equals(String.class)) {
-                        int i = Randoms.randomInt(1, 16);
-                        method.invoke(t, i <= 8 ? Randoms.randomChinese(i) : Randoms.randomCodes(i));
-                    } else if (paramClass.equals(Short.class) || paramClass.equals(Short.TYPE)) {
-                        method.invoke(t, (short) new Random().nextInt(5));
-                    } else if (paramClass.equals(Float.class) || paramClass.equals(Float.TYPE)) {
-                        int i = new Random().nextInt(3);
-                        method.invoke(t, Calcs.mul(new Random().nextFloat(), Math.pow(10, i), 2).floatValue());
-                    } else if (paramClass.equals(Double.class) || paramClass.equals(Double.TYPE)) {
-                        int i = new Random().nextInt(6);
-                        method.invoke(t, Calcs.mul(new Random().nextDouble(), Math.pow(10, i), 2).floatValue());
-                    } else if (paramClass.equals(Integer.class) || paramClass.equals(Integer.TYPE)) {
-                        method.invoke(t, new Random().nextInt(999));
-                    } else if (paramClass.equals(Long.class) || paramClass.equals(Long.TYPE)) {
-                        method.invoke(t, (long) new Random().nextInt(99999999));
-                    } else if (paramClass.equals(Date.class)) {
-                        method.invoke(t, new Date());
-                    } else if (paramClass.equals(Timestamp.class)) {
-                        method.invoke(t, new Timestamp(System.currentTimeMillis()));
-                    } else if (paramClass.equals(java.sql.Date.class)) {
-                        method.invoke(t, new java.sql.Date(System.currentTimeMillis()));
-                    }
+                    method.invoke(t, generateRandomValueByParamType(paramClass));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -62,44 +40,98 @@ public class DataGenerator {
         return t;
     }
 
+    /** 根据类型生成对应类型的随机数据 */
+    public static <T> T generateRandomValueByParamType(Class<T> paramClass) {
+        Object result = null;
+        if (paramClass.equals(String.class)) {
+            int i = Randoms.randomInt(1, 16);
+            result = i <= 8 ? Randoms.randomChinese(i) : Randoms.randomCodes(i);
+        } else if (paramClass.equals(Short.class) || paramClass.equals(Short.TYPE)) {
+            result = (short) new Random().nextInt(5);
+        } else if (paramClass.equals(Boolean.class) || paramClass.equals(Boolean.TYPE)) {
+            result = Randoms.randomInt(0, 1) > 0;
+        } else if (paramClass.equals(Double.class) || paramClass.equals(Double.TYPE)) {
+            int i = new Random().nextInt(6);
+            result = Calcs.mul(new Random().nextDouble(), Math.pow(10, i), 2).doubleValue();
+        } else if (paramClass.equals(Float.class) || paramClass.equals(Float.TYPE)) {
+            int i = new Random().nextInt(3);
+            result = Calcs.mul(new Random().nextFloat(), Math.pow(10, i), 2).floatValue();
+        } else if (paramClass.equals(Long.class) || paramClass.equals(Long.TYPE)) {
+            result = (long) new Random().nextInt(99999999);
+        } else if (paramClass.equals(Integer.class) || paramClass.equals(Integer.TYPE)) {
+            result = new Random().nextInt(999);
+        } else if (paramClass.equals(Date.class)) {
+            result = new Date();
+        } else if (paramClass.equals(Timestamp.class)) {
+            result = new Timestamp(System.currentTimeMillis());
+        } else if (paramClass.equals(java.sql.Date.class)) {
+            result = new java.sql.Date(System.currentTimeMillis());
+        }
+        return (T) result;
+    }
+
+    /** 根据类型生成对应类型的默认数据 */
+    public static <T> T generateDefaultValueByParamType(Class<T> paramClass) {
+        Object result = null;
+        if (paramClass.equals(String.class)) {
+            result = "";
+        } else if (paramClass.equals(Short.class) || paramClass.equals(Short.TYPE)) {
+            result = (short) 0;
+        } else if (paramClass.equals(Boolean.class) || paramClass.equals(Boolean.TYPE)) {
+            result = false;
+        } else if (paramClass.equals(Double.class) || paramClass.equals(Double.TYPE)) {
+            result = 0.0d;
+        } else if (paramClass.equals(Float.class) || paramClass.equals(Float.TYPE)) {
+            result = 0.0f;
+        } else if (paramClass.equals(Long.class) || paramClass.equals(Long.TYPE)) {
+            result = 0L;
+        } else if (paramClass.equals(Integer.class) || paramClass.equals(Integer.TYPE)) {
+            result = 0;
+        }
+        return (T) result;
+    }
+
+    /** 根据类型生成对应类型的数据 */
+    public static <T> T generateValueByParamType(Class<T> paramClass, GenerateType type) {
+        T result = null;
+        if (type.equals(GenerateType.RANDOM)) {
+            result = generateRandomValueByParamType(paramClass);
+        } else if (type.equals(GenerateType.DEFAULT)) {
+            result = generateDefaultValueByParamType(paramClass);
+        }
+        return result;
+    }
+
     /**
      * 填充一个Map（一般用于测试）
      */
     public static Map<String, Object> fullMap() {
-        Map<String, Object> map = new HashMap<String, Object>(8);
-        int i = Randoms.randomInt(1, 16);
-        String str = i <= 8 ? Randoms.randomChinese(i) : Randoms.randomCodes(i);
-        map.put("string", str);
-
-        short nShort = (short) new Random().nextInt(5);
-        map.put("short", nShort);
-
-        i = new Random().nextInt(3);
-        float nFloat = Calcs.mul(new Random().nextFloat(), Math.pow(10, i), 2).floatValue();
-        map.put("float", nFloat);
-
-        i = new Random().nextInt(6);
-        double nDouble = Calcs.mul(new Random().nextDouble(), Math.pow(10, i), 2).doubleValue();
-        map.put("double", nDouble);
-
-        i = new Random().nextInt(999);
-        map.put("int", i);
-
-        long l = (long) new Random().nextInt(99999999);
-        map.put("long", l);
-
-        map.put("date", new Date());
-
+        Map<String, Object> map = new HashMap<>(8);
+        map.put("string", generateRandomValueByParamType(String.class));
+        map.put("short", generateRandomValueByParamType(short.class));
+        map.put("float", generateRandomValueByParamType(float.class));
+        map.put("double", generateRandomValueByParamType(double.class));
+        map.put("int", generateRandomValueByParamType(int.class));
+        map.put("long", generateRandomValueByParamType(long.class));
+        map.put("date", generateRandomValueByParamType(Date.class));
         map.put("array", Arrays.asList(1, 2, 3, 4, 5));
         return map;
     }
 
+    /** 填充一个对应类型的List */
     public static <T> List<T> fullListBean(Class<T> cl, int size) {
-        List<T> list = new ArrayList<T>(size);
+        List<T> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             list.add(fullObject(cl));
         }
         return list;
     }
 
+    /** 生成数据方式 */
+    public enum GenerateType {
+        /** 随机值 */
+        RANDOM,
+        /** 默认值 */
+        DEFAULT
+    }
 }

@@ -3,7 +3,7 @@ package org.jujubeframework.lang;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jujubeframework.util.Beans;
 import org.jujubeframework.util.CamelCase;
-import static org.jujubeframework.util.Dynamics.bool;
+import org.jujubeframework.util.Pojos;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -11,8 +11,10 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.jujubeframework.util.Dynamics.bool;
+
 /**
- * 一个进阶版的Map，一般作为数据库表的一行数据存在，也可以作为其他数据载体
+ * 一个进阶版的Map，一般作为数据库表的一行数据存在。注意他与Map的最大区别是：如果把Bean转换为Record，则默认驼峰命名变为下划线命名方式
  *
  * @author John Li
  */
@@ -27,6 +29,10 @@ public class Record extends HashMap<String, Object> {
         if (map != null) {
             putAll(map);
         }
+    }
+
+    public Record(int size) {
+        super(size);
     }
 
     /**
@@ -142,8 +148,18 @@ public class Record extends HashMap<String, Object> {
         return this;
     }
 
+    /**
+     * Bean对象转换为Record,所有字段名都由驼峰转为下划线格式
+     */
     public static Record valueOf(Object obj) {
-        return new Record(convertBeanToMap(obj, false));
+        return new Record(convertBeanToMap(obj));
+    }
+
+    public static Record valueOfNullable(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        return new Record(convertBeanToMap(obj));
     }
 
     public Record getRecord(String key) {
@@ -152,11 +168,8 @@ public class Record extends HashMap<String, Object> {
 
     /**
      * Bean对象转换为Map,所有字段名都由驼峰转为下划线格式
-     *
-     * @param allowNull 是否允许null值
      */
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> convertBeanToMap(Object javaBean, boolean allowNull) {
+    private static Map<String, Object> convertBeanToMap(Object javaBean) {
         if (javaBean == null) {
             return null;
         }
@@ -166,18 +179,37 @@ public class Record extends HashMap<String, Object> {
         Field[] fields = javaBean.getClass().getDeclaredFields();
         Map<String, Object> result = new HashMap<>(fields.length);
         for (Field field : fields) {
-            Object value = null;
+            Object value;
             try {
                 value = Beans.getProperty(javaBean, field.getName());
             } catch (Exception e) {
                 continue;
             }
-            if (!allowNull && value == null) {
+            if (value == null) {
                 continue;
             }
             String dbField = CamelCase.toUnderlineName(field.getName());
             result.put(dbField, value);
         }
         return result;
+    }
+
+    public <T> T toEntity(Class<T> tClass) {
+        return Pojos.mapping(this, tClass);
+    }
+
+    @Deprecated
+    public static <T> T toBean(Record record, Class<T> tClass) {
+        return Pojos.mapping(record, tClass);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

@@ -1,13 +1,17 @@
 package org.jujubeframework.util;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Table;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -20,14 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 为减少技术选型，使用Spring内置的Jackson作为json转换工具
+ * Json工具
  *
  * @author John Li Email：jujubeframework@163.com
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Jsons {
 
-    private static Logger logger = LoggerFactory.getLogger(Jsons.class);
+    private static final Logger logger = LoggerFactory.getLogger(Jsons.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     static {
@@ -37,11 +41,32 @@ public class Jsons {
         OBJECT_MAPPER.configure(SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, true);
         OBJECT_MAPPER.configure(Feature.ALLOW_SINGLE_QUOTES, true);
 
-        // 过滤对象的null属性.
-        // objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        // 过滤map中的null值
-        // objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES,
-        // false);
+        // 添加序列化方案
+        OBJECT_MAPPER.registerModule(new GuavaModule());
+        OBJECT_MAPPER.registerModule(new JodaModule());
+        OBJECT_MAPPER.registerModule(new Jdk8Module());
+        // Guava的Table没有反序列化方案，只能使用自定义方案了
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addDeserializer(Table.class, new TableDeserializer());
+        OBJECT_MAPPER.registerModule(simpleModule);
+    }
+
+    /** Guavua Table的反序列化方案 */
+    public static class TableDeserializer extends JsonDeserializer<Table<?, ?, ?>> {
+        @Override
+        public Table<?, ?, ?> deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException {
+            final ImmutableTable.Builder<Object, Object, Object> tableBuilder = ImmutableTable.builder();
+            final Map<Object, Map<Object, Object>> rowMap = jp.readValueAs(Map.class);
+            for (final Map.Entry<Object, Map<Object, Object>> rowEntry : rowMap.entrySet()) {
+                final Object rowKey = rowEntry.getKey();
+                for (final Map.Entry<Object, Object> cellEntry : rowEntry.getValue().entrySet()) {
+                    final Object colKey = cellEntry.getKey();
+                    final Object val = cellEntry.getValue();
+                    tableBuilder.put(rowKey, colKey, val);
+                }
+            }
+            return tableBuilder.build();
+        }
     }
 
     /**
@@ -108,8 +133,10 @@ public class Jsons {
      *  3、将json字符串转换为List&lt;Map&lt;String,Object&gt;&gt;的泛型：parseJson(text,new TypeReference&lt;List&lt;Map&lt;String,Object&gt;&gt;&gt;(){})
      * </pre>
      *
-     * @param text          json字符串
-     * @param typeReference 类型引用
+     * @param text
+     *            json字符串
+     * @param typeReference
+     *            类型引用
      */
     public static <T> T parseJson(String text, TypeReference<T> typeReference) {
         if (StringUtils.isBlank(text)) {
@@ -126,13 +153,9 @@ public class Jsons {
     /**
      * 将json字符串转换为对应类型的Java对象（不常用）
      */
-    @SuppressWarnings("unchecked")
     public static <T> T parseJson(String text, Type type) {
         if (StringUtils.isBlank(text)) {
             return null;
-        }
-        if (String.class.getTypeName().equals(type.getTypeName())) {
-            return (T) text;
         }
         try {
             return OBJECT_MAPPER.readValue(text, TypeFactory.defaultInstance().constructType(type));

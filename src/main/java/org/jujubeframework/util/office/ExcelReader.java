@@ -2,19 +2,19 @@ package org.jujubeframework.util.office;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.util.LocaleUtil;
+import org.jujubeframework.util.Beans;
+import org.jujubeframework.util.Collections3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.*;
+import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +26,9 @@ import java.util.NoSuchElementException;
  * @author John Li Email：jujubeframework@163.com
  */
 public class ExcelReader implements Iterable<List<String>> {
+
+    public static final String DATA_FORMAT_TEXT = "@";
+
     /**
      * 一个Sheet工作薄
      */
@@ -34,50 +37,37 @@ public class ExcelReader implements Iterable<List<String>> {
      * 工作薄的总行数
      */
     private int rowCount;
-    private ExcelReaderConfig config;
-    private File currentExcel;
-    private FileInputStream excelInputStream;
+    private final ExcelReaderConfig config;
     private FormulaEvaluator evaluator;
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 构造函数
      *
-     * @param file       Excel文件
-     * @param sheetIndex 要解析的sheetIndex,从0开始
+     * @param inputStream
+     *            Excel文件流
+     * @param sheetIndex
+     *            要解析的sheetIndex,从0开始
      */
-    public ExcelReader(File file, int sheetIndex, ExcelReaderConfig config) {
+    public ExcelReader(InputStream inputStream, int sheetIndex, ExcelReaderConfig config) {
         Validate.notNull(config);
         this.config = config;
-        init(file, sheetIndex);
+        init(inputStream, sheetIndex);
     }
 
     /**
      * 初始化
      */
-    private void init(File file, int sheetIndex) {
-        logger.debug("解析文件：" + file.getAbsolutePath() + " 开始...");
-        Validate.isTrue(file.exists(), "file not exists:" + file.getAbsolutePath());
+    private void init(InputStream inputStream, int sheetIndex) {
         try {
-            currentExcel = file;
-            excelInputStream = new FileInputStream(currentExcel);
-            Workbook workbook = WorkbookFactory.create(excelInputStream);
-            if (workbook instanceof HSSFWorkbook) {
-                evaluator = new HSSFFormulaEvaluator((HSSFWorkbook) workbook);
-            } else if (workbook instanceof XSSFWorkbook) {
-                evaluator = new XSSFFormulaEvaluator((XSSFWorkbook) workbook);
-            } else if (workbook instanceof SXSSFWorkbook) {
-                evaluator = new XSSFFormulaEvaluator(((SXSSFWorkbook) workbook).getXSSFWorkbook());
-            }
-            sheet = workbook.getSheetAt(sheetIndex);
-            rowCount = config.isBlankLineTerminated() ? realRows() : sheet.getLastRowNum() + 1;
-        } catch (InvalidFormatException e) {
-            logger.error("ExcelReader.init", e);
+            Workbook curWorkbook = WorkbookFactory.create(inputStream);
+            this.evaluator = curWorkbook.getCreationHelper().createFormulaEvaluator();
+            this.sheet = curWorkbook.getSheetAt(sheetIndex);
+            this.rowCount = config.isBlankLineTerminated() ? realRows() : sheet.getLastRowNum() + 1;
         } catch (IOException e) {
             logger.error("ExcelReader.init", e);
         }
-        logger.debug("解析文件：" + file.getAbsolutePath() + " 结束！");
     }
 
     /**
@@ -142,15 +132,12 @@ public class ExcelReader implements Iterable<List<String>> {
      * 获得相应行数据
      */
     public List<String> getRow(int rowNo) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         Row row = sheet.getRow(rowNo);
         if (row != null) {
             for (int i = 0; i < row.getLastCellNum(); i++) {
                 Cell cell = row.getCell(i);
                 String cellContent = getCellContent(cell);
-                if (config.isReplaceCellLineBreak()) {
-                    cellContent = cellContent.replaceAll("\\n|\\r", "");
-                }
                 if (config.isTrimCellContent()) {
                     cellContent = cellContent.trim();
                 }
@@ -167,27 +154,71 @@ public class ExcelReader implements Iterable<List<String>> {
         String cellContent = "";
         if (cell != null) {
             // 如果有表格中单元格有公式，cell.toString()得不到正确结果。这里需要做下处理。需要注意：公式计算出来的数字大多为浮点型，需要客户端去精确
-            if (cell.getCellTypeEnum() == CellType.FORMULA) {
+            switch (cell.getCellType()) {
+            case FORMULA:
                 try {
-                    CellValue cellValue = evaluator.evaluate(cell);
-                    cellContent = cellValue.formatAsString();
-                } catch (Exception e) {
-                    cellContent = cell.toString();
+                    cellContent = String.valueOf(cell.getNumericCellValue());
+                } catch (IllegalStateException e) {
+                    try {
+                        cellContent = String.valueOf(cell.getRichStringCellValue());
+                    } catch (IllegalStateException e1) {
+                        try {
+                            CellValue cellValue = evaluator.evaluate(cell);
+                            cellContent = cellValue.formatAsString();
+                        } catch (Exception e2) {
+                            cellContent = cell.toString();
+                        }
+                    }
                 }
-            } else {
+                break;
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", LocaleUtil.getUserLocale());
+                    sdf.setTimeZone(LocaleUtil.getUserTimeZone());
+                    return sdf.format(cell.getDateCellValue());
+                }
+                cell.setCellType(CellType.STRING);
                 cellContent = cell.toString();
+                break;
+            default:
+                cell.setCellType(CellType.STRING);
+                cellContent = cell.toString();
+                break;
             }
         }
         return cellContent;
     }
 
+    /** 获得所有行集合 */
+    public List<List<String>> getRows() {
+        return Collections3.getListFromIterator(iterator());
+    }
+
     /**
-     * 关闭excel文件资源
+     * Excel数据转换为List entity
+     *
+     * @param wipeOffHead
+     *            是否去除头部
      */
-    public void close() throws IOException {
-        if (excelInputStream != null) {
-            excelInputStream.close();
+    public <T> List<T> toEntity(Class<T> entityClass, boolean wipeOffHead) {
+        List<T> list = new ArrayList<>();
+        Field[] fields = entityClass.getDeclaredFields();
+        for (int i = wipeOffHead ? 1 : 0; i < getRowCount(); i++) {
+            List<String> row = getRow(i);
+            T t = Beans.getInstance(entityClass);
+            for (Field field : fields) {
+                ExcelColumn fieldAnnotation = field.getAnnotation(ExcelColumn.class);
+                if (fieldAnnotation != null) {
+                    int index = fieldAnnotation.value();
+                    if (row.size() > index) {
+                        String val = row.get(index);
+                        Beans.setProperty(t, field.getName(), val);
+                    }
+                }
+            }
+            list.add(t);
         }
+        return list;
     }
 
     private class Itr implements Iterator<List<String>> {
@@ -216,8 +247,14 @@ public class ExcelReader implements Iterable<List<String>> {
 
     }
 
-    public File getFile() {
-        return currentExcel;
+    /** Excel中的列 */
+    @Documented
+    @Target(value = { ElementType.FIELD })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    public @interface ExcelColumn {
+        /**
+         * 列的下标排序，从0开始
+         */
+        int value();
     }
-
 }

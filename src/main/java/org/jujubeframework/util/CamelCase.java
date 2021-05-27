@@ -25,8 +25,8 @@ public class CamelCase {
     /**
      * 字段转换的缓存
      */
-    private static Map<String, String> underLine_fieldCache = new ConcurrentHashMap<String, String>();
-    private static Map<String, String> camelCase_fieldCache = new ConcurrentHashMap<String, String>();
+    private static final Map<String, String> UNDER_LINE_FIELD_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, String> CAMEL_CASE_FIELD_CACHE = new ConcurrentHashMap<>();
 
     private static final char SEPARATOR = '_';
 
@@ -39,7 +39,7 @@ public class CamelCase {
         }
 
         // 先从cache中取值
-        String cache = underLine_fieldCache.get(input);
+        String cache = UNDER_LINE_FIELD_CACHE.get(input);
         if (cache != null) {
             return cache;
         }
@@ -55,7 +55,7 @@ public class CamelCase {
                 nextUpperCase = Character.isUpperCase(input.charAt(i + 1));
             }
 
-            if ((i >= 0) && Character.isUpperCase(c)) {
+            if (Character.isUpperCase(c)) {
                 if (!upperCase || !nextUpperCase) {
                     if (i > 0) {
                         resultSb.append(SEPARATOR);
@@ -70,7 +70,7 @@ public class CamelCase {
         }
 
         String result = resultSb.toString();
-        underLine_fieldCache.put(input, result);
+        UNDER_LINE_FIELD_CACHE.put(input, result);
         return result;
     }
 
@@ -86,16 +86,15 @@ public class CamelCase {
         }
 
         // 先从cache中取值
-        String cache = camelCase_fieldCache.get(input);
+        String cache = CAMEL_CASE_FIELD_CACHE.get(input);
         if (cache != null) {
             return cache;
         }
 
-        String curInput = input;
-        StringBuilder resultSb = new StringBuilder(curInput.length());
+        StringBuilder resultSb = new StringBuilder(input.length());
         boolean upperCase = false;
-        for (int i = 0; i < curInput.length(); i++) {
-            char c = curInput.charAt(i);
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
             if (c == SEPARATOR) {
                 upperCase = true;
             } else if (upperCase) {
@@ -107,7 +106,7 @@ public class CamelCase {
         }
 
         String result = resultSb.toString();
-        camelCase_fieldCache.put(input, result);
+        CAMEL_CASE_FIELD_CACHE.put(input, result);
         return result;
     }
 
@@ -116,18 +115,13 @@ public class CamelCase {
      */
     public static String toSpecilCamelCase(String input) {
         // 先从cache中取值
-        String cache = camelCase_fieldCache.get(input);
+        String cache = CAMEL_CASE_FIELD_CACHE.get(input);
         if (cache != null) {
             return cache;
         }
-
         String temp = toCamelCase(input);
-        StringBuilder resultSb = new StringBuilder(temp.length());
-        resultSb.append(temp.substring(0, 2).toLowerCase());
-        resultSb.append(temp.substring(2));
-
-        String result = resultSb.toString();
-        camelCase_fieldCache.put(input, result);
+        String result = temp.substring(0, 2).toLowerCase() + temp.substring(2);
+        CAMEL_CASE_FIELD_CACHE.put(input, result);
         return result;
     }
 

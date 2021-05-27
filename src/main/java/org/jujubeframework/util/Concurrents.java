@@ -2,7 +2,7 @@ package org.jujubeframework.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.jujubeframework.util.support.concurrent.PreNameThreadFactory;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,26 +19,25 @@ import java.util.function.Supplier;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Concurrents {
 
-    protected static Logger logger = LoggerFactory.getLogger(Concurrents.class);
+    protected final static Logger logger = LoggerFactory.getLogger(Concurrents.class);
 
     /**
      * 带超时设置的执行
      *
-     * @param execBody             执行主体
-     * @param timeout              超时时间,单位为毫秒
-     * @param timeoutExceptionCall 超时异常的回调
+     * @param execBody
+     *            执行主体
+     * @param timeout
+     *            超时时间,单位为毫秒
+     * @param timeoutExceptionCall
+     *            超时异常的回调
      */
-    @SuppressWarnings("unchecked")
     public static <T> T execOfTimeout(Supplier<T> execBody, long timeout, Consumer<Exception> timeoutExceptionCall) {
         final AtomicReference<T> temp = new AtomicReference<>();
-        ExecutorService executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(50), new PreNameThreadFactory("concurrents-execoftimeout"));
+        ExecutorService executor = createThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, 50, "concurrents-execoftimeout-");
         T result = null;
-        Future<Boolean> future = executor.submit(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                temp.set(execBody.get());
-                return true;
-            }
+        Future<Boolean> future = executor.submit(() -> {
+            temp.set(execBody.get());
+            return true;
         });
         try {
             future.get(timeout, TimeUnit.MILLISECONDS);
@@ -57,5 +56,40 @@ public class Concurrents {
             executor.shutdown();
         }
         return result;
+    }
+
+    /** 创建一个通用的线程池 */
+    public static ExecutorService createThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, int workQueueNum, String threadPrefixName) {
+        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, new ArrayBlockingQueue<>(workQueueNum),
+                new BasicThreadFactory.Builder().namingPattern(threadPrefixName + "%d").build());
+    }
+
+    /**
+     * 等待某个任务执行完毕
+     *
+     * @param supplier
+     *            任务是否完成，完成为true
+     * @param intervalTime
+     *            任务结果获取的间隔时间
+     */
+    public static void await(Supplier<Boolean> supplier, int intervalTime) {
+        while (!supplier.get()) {
+            Runtimes.sleep(intervalTime);
+        }
+    }
+
+    /**
+     * 等待某个任务执行完毕
+     *
+     * @param supplier
+     *            任务是否完成，完成为true
+     * @param intervalTime
+     *            任务结果获取的间隔时间
+     */
+    public static void await(Supplier<Boolean> supplier, int intervalTime, int maxRetryTime) {
+        int num = 0;
+        while (!supplier.get() && num++ < maxRetryTime) {
+            Runtimes.sleep(intervalTime);
+        }
     }
 }

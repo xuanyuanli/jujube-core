@@ -4,7 +4,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,11 +20,10 @@ import java.util.List;
  *
  * @author John Li
  */
-@SuppressWarnings("AlibabaUndefineMagicConstant")
 public class Calcs {
 
-    public static final double DOUBLE_ZERO = 0.0d;
-    public static final int TWO = 2;
+    private static final double DOUBLE_ZERO = 0.0d;
+    private static final int TWO = 2;
 
     private Calcs() {
     }
@@ -42,22 +40,14 @@ public class Calcs {
         // stripTrailingZeros()能去掉后面的0，进行比较
         BigDecimal b1 = new BigDecimal(str1).stripTrailingZeros();
         BigDecimal b2 = new BigDecimal(str2).stripTrailingZeros();
-        boolean b = b1.equals(b2);
-        return b;
+        return b1.equals(b2);
     }
 
     /**
      * 确认两个金额值是否相等（非常严谨的比较）
      */
     public static boolean equ(Number str1, Number str2) {
-        return equ(String.valueOf(str1), str2.toString());
-    }
-
-    /**
-     * 确认两个金额值是否相等（非常严谨的比较）
-     */
-    public static boolean equ(Number str1, String str2) {
-        return equ(String.valueOf(str1), str2);
+        return equ(String.valueOf(str1 == null ? "0" : str1), str2 != null ? str2.toString() : "0");
     }
 
     /**
@@ -78,19 +68,28 @@ public class Calcs {
     }
 
     /**
+     * 第一个数是否小于等于第二个数
+     */
+    public static boolean isLte(Number str1, Number str2) {
+        return isLow(str1, str2) || equ(str1, str2);
+    }
+
+    /**
      * 第一个数是否比第二个数小（非常严谨的比较）
      */
-    public static boolean isLow(Number str1, String str2) {
-        return isLow(String.valueOf(str1), str2);
+    public static boolean isLow(Number str1, Number str2) {
+        return isLow(String.valueOf(str1 == null ? "0" : str1), String.valueOf(str2 == null ? "0" : str2));
     }
 
     /**
      * 加法运算
      *
-     * @param str1   被加数
-     * @param str2   加数
-     * @param iScale 精确度（小数点后保留位数）
-     * @return
+     * @param str1
+     *            被加数
+     * @param str2
+     *            加数
+     * @param iScale
+     *            精确度（小数点后保留位数）
      */
     public static String add(String str1, String str2, int iScale) {
         Validate.notBlank(str1);
@@ -110,15 +109,23 @@ public class Calcs {
      * 加法
      */
     public static Number add(Number str1, Number str2, int iScale) {
-        return NumberUtils.toDouble(add(String.valueOf(str1), String.valueOf(str2), iScale));
+        return NumberUtils.toDouble(add(String.valueOf(str1 == null ? "0" : str1), String.valueOf(str2 == null ? "0" : str2), iScale));
     }
 
     /**
-     * 加法运算
+     * 加法,保留2位
+     */
+    public static double add(Double d1, Double d2) {
+        return add(d1, d2, 2).doubleValue();
+    }
+
+    /**
+     * 加法运算,保留2位
      *
-     * @param str1 被加数
-     * @param str2 加数
-     * @return
+     * @param str1
+     *            被加数
+     * @param str2
+     *            加数
      */
     public static String add(String str1, String str2) {
         return add(str1, str2, 2);
@@ -127,10 +134,12 @@ public class Calcs {
     /**
      * 减法
      *
-     * @param str1   被减数
-     * @param str2   减数
-     * @param iScale 精确度（小数点后保留位数）
-     * @return
+     * @param str1
+     *            被减数
+     * @param str2
+     *            减数
+     * @param iScale
+     *            精确度（小数点后保留位数）
      */
     public static String sub(String str1, String str2, int iScale) {
         Validate.notBlank(str1);
@@ -147,11 +156,12 @@ public class Calcs {
     }
 
     /**
-     * 减法运算
+     * 减法运算,保留2位
      *
-     * @param str1 被减数
-     * @param str2 减数
-     * @return
+     * @param str1
+     *            被减数
+     * @param str2
+     *            减数
      */
     public static String sub(String str1, String str2) {
         return sub(str1, str2, 2);
@@ -161,16 +171,25 @@ public class Calcs {
      * 减法
      */
     public static Number sub(Number str1, Number str2, int iScale) {
-        return NumberUtils.toDouble(sub(String.valueOf(str1), String.valueOf(str2), iScale));
+        return NumberUtils.toDouble(sub(String.valueOf(str1 == null ? "0" : str1), String.valueOf(str2 == null ? "0" : str2), iScale));
+    }
+
+    /**
+     * 减法,保留2位
+     */
+    public static double sub(Double d1, Double d2) {
+        return sub(d1, d2, 2).doubleValue();
     }
 
     /**
      * 乘法运算 指定保留到小数点后位数
      *
-     * @param str1   被乘数
-     * @param str2   乘数
-     * @param iScale 精确度（小数点后保留位数）
-     * @return
+     * @param str1
+     *            被乘数
+     * @param str2
+     *            乘数
+     * @param iScale
+     *            精确度（小数点后保留位数）
      */
     public static String mul(String str1, String str2, int iScale) {
         Validate.notBlank(str1);
@@ -188,28 +207,36 @@ public class Calcs {
     }
 
     /**
-     * 乘法运算
+     * 乘法运算,保留2位
      */
     public static String mul(String str1, String str2) {
         return mul(str1, str2, 2);
     }
 
     /**
+     * 乘法运算,保留2位
+     */
+    public static double mul(Double str1, Double str2) {
+        return mul(str1, str2, 2).doubleValue();
+    }
+
+    /**
      * 乘法
      */
     public static Number mul(Number str1, Number str2, int iScale) {
-        return NumberUtils.toDouble(mul(String.valueOf(str1), String.valueOf(str2), iScale));
+        return NumberUtils.toDouble(mul(String.valueOf(str1 == null ? "0" : str1), String.valueOf(str2 == null ? "0" : str2), iScale));
     }
 
     /**
      * 除法运算 指定保留到小数点后位数
      *
-     * @param str1   被除数
-     * @param str2   除数
-     * @param iScale 精确度（小数点后保留位数）
-     * @return
+     * @param str1
+     *            被除数
+     * @param str2
+     *            除数
+     * @param iScale
+     *            精确度（小数点后保留位数）
      */
-    @SuppressWarnings("AlibabaUndefineMagicConstant")
     public static String div(String str1, String str2, int iScale) {
         Validate.notBlank(str1);
         Validate.notBlank(str2);
@@ -237,7 +264,11 @@ public class Calcs {
      * 除法
      */
     public static Number div(Number str1, Number str2, int iScale) {
-        return NumberUtils.toDouble(div(String.valueOf(str1), String.valueOf(str2), iScale));
+        return NumberUtils.toDouble(div(String.valueOf(str1 == null ? "0" : str1), String.valueOf(str2 == null ? "0" : str2), iScale));
+    }
+
+    public static Double div(Double str1, Double str2) {
+        return div(str1, str2, 2).doubleValue();
     }
 
     /**
@@ -245,8 +276,8 @@ public class Calcs {
      */
     public static double getAverage(List<Double> list) {
         double sum = 0;
-        for (int i = 0; i < list.size(); i++) {
-            sum += list.get(i).doubleValue();
+        for (Double aDouble : list) {
+            sum += aDouble;
         }
         return sum / list.size();
     }
@@ -257,30 +288,12 @@ public class Calcs {
     public static double getMedian(List<Double> list) {
         Collections.sort(list);
         if (list.size() % TWO == 0) {
-            int index = (int) (list.size() / 2) - 1;
+            int index = (list.size() / 2) - 1;
             return (list.get(index) + list.get(index + 1)) / 2;
         } else {
-            int index = (int) (list.size() / 2) + 1;
-            return list.get(index).doubleValue();
+            int index = (list.size() / 2) + 1;
+            return list.get(index);
         }
     }
 
-    /**
-     * 数字格式化
-     */
-    public static String numberFormat(Number number, String pattern) {
-        DecimalFormat myformat = new DecimalFormat();
-        myformat.applyPattern(pattern);
-        return myformat.format(number);
-    }
-
-    /**
-     * 把number转换为string，非科学计数法
-     */
-    public static String numberToString(Number value) {
-        // 格式化设置
-        DecimalFormat decimalFormat = new DecimalFormat("###########.##########");
-        decimalFormat.setGroupingUsed(false);
-        return decimalFormat.format(value);
-    }
 }

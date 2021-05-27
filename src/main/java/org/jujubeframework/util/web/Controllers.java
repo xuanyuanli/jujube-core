@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
+ * Spring MVC Controller扩展工具
+ * 
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -14,7 +16,8 @@ public class Controllers {
     /**
      * 重定向
      *
-     * @param url url
+     * @param url
+     *            url
      */
     public static String redirect(String url) {
         return "redirect:" + url;

@@ -12,18 +12,22 @@ import java.io.File;
 import java.io.FileInputStream;
 
 /**
+ * word读取工具
+ * 
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WordReader {
 
-    private static Logger logger = LoggerFactory.getLogger(WordReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(WordReader.class);
 
+    /**
+     * 获得word内容
+     */
     public static String getWordContent(String filePath) {
         String result = "";
         File wordFile = new File(filePath);
         if (wordFile.exists()) {
-            ;
             // word2003版本
             try (WordExtractor wordExtractor = new WordExtractor(new FileInputStream(wordFile))) {
                 result = wordExtractor.getText();

@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * Servlet Cookie工具
+ * 
  * @author John Li
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,7 +38,8 @@ public class Cookies {
     /**
      * 添加Cookie
      *
-     * @param maxAge 存活时间，以秒为单位
+     * @param maxAge
+     *            存活时间，以秒为单位
      */
     public static void addCookie(HttpServletResponse response, String key, String value, int maxAge) {
         Validate.notBlank(key);

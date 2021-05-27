@@ -1,10 +1,15 @@
 org.jujubeframework.constant
+org.jujubeframework.exception
+org.jujubeframework.jdbc.support.annotation
+org.jujubeframework.jdbc.support.entity
+org.jujubeframework.jdbc.support.pagination
 org.jujubeframework.lang
+org.jujubeframework.spring
 org.jujubeframework.util
 org.jujubeframework.util.net
 org.jujubeframework.util.office
 org.jujubeframework.util.security
+org.jujubeframework.util.snowflake
 org.jujubeframework.util.support
-org.jujubeframework.util.support.concurrent
 org.jujubeframework.util.support.freemarker
 org.jujubeframework.util.web

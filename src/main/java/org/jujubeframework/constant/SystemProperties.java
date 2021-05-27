@@ -102,7 +102,7 @@ public class SystemProperties {
     public static final boolean JRE_IS_64BIT;
 
     static {
-        boolean is64Bit = false;
+        boolean is64Bit;
         try {
             final Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
             final Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
@@ -114,13 +114,9 @@ public class SystemProperties {
             final String x = System.getProperty("sun.arch.data.model");
             String str64 = "64";
             if (x != null) {
-                is64Bit = x.indexOf(str64) != -1;
+                is64Bit = x.contains(str64);
             } else {
-                if (OS_ARCH != null && OS_ARCH.indexOf(str64) != -1) {
-                    is64Bit = true;
-                } else {
-                    is64Bit = false;
-                }
+                is64Bit = OS_ARCH != null && OS_ARCH.contains(str64);
             }
         }
         JRE_IS_64BIT = is64Bit;
