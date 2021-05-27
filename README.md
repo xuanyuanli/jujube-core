@@ -36,7 +36,10 @@
         <dependency>
             <groupId>io.github.jujube-framework</groupId>
             <artifactId>jujube-core</artifactId>
-            <version>1.4</version>
+            <version>2.0</version>
         </dependency>
 ```
+
+# 补充
+`mvn clean deploy -P release`
 
