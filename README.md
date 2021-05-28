@@ -9,7 +9,7 @@
 你如果需要一个三方包，还有很多其他选择，如Hutool等。  
 
 # News
-- [2.0](https://github.com/jujube-framework/jujube-jdbc/releases/tag/v2.0) 包结构调整，大量工具类性能优化
+- [2.0](https://github.com/jujube-framework/jujube-core/releases/tag/v2.0) 包结构调整，大量工具类性能优化
 
 
 # 依赖的其他三方包
