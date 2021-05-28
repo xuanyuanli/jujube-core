@@ -8,7 +8,7 @@
 但jujube-core的理念不是这样的，他也集中了不少业界流行的三方包作为基础，但他更好的用途还是作为一个二方包存在比较好。  
 你如果需要一个三方包，还有很多其他选择，如Hutool等。  
 
-# News
+# ✨News
 - [2.0](https://github.com/jujube-framework/jujube-core/releases/tag/v2.0) 包结构调整，大量工具类性能优化
 
 
